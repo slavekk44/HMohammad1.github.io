@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cookie-session": "^2.0.0",
+    "ejs": "^3.1.8",
+    "express": "^4.18.2",
+    "nodemon": "^2.0.20"
+  },
+  "name": "softwareengineeringgp",
+  "description": "",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HMohammad1/SoftwareEngineeringGP.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HMohammad1/SoftwareEngineeringGP/issues"
+  },
+  "homepage": "https://github.com/HMohammad1/SoftwareEngineeringGP#readme"
+}

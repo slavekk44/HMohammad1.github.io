@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+    <head>
+        <title>Create Account | Scrapmap</title>
+    </head>
+    <body>
+        <h1>Sign Up!</h1>
+        <div class="containter-fluid">
+            <form name="contact-details" action="API/signup" method="post">
+                <div class="personal-info">
+                    <div class="username">
+                        <input id="username" name="username" placeholder="Username"/>
+                        <input id="disp_name" name="disp_name" placeholder="Display Name"/>
+                    </div>
+                    <div class="contact-name">
+                        <input id="fname" name="fname" placeholder="First Name">
+                        <input id="lname" name="lname" placeholder="Last Name">
+                    </div>
+                    <div class="contact-details">
+                        <input id="email" name="email" placeholder="Email Address">
+                    </div>
+                </div>
+                <div class="password">
+                    <input id="pw1" name="pw1" placeholder="Password"/>
+                    <input id="pw2" name="pw2" placeholder="Confirm Password"/>
+                </div>
+                <div class="row">
+                    <input type="submit" name="submit"/>
+                </div>
+            </form>
+        </div>
+    </body>
+</html>
