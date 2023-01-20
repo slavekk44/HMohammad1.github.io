@@ -37,6 +37,11 @@ app.get("/signup", (req, res) => {
     res.render("signup");
 });
 
+
+//dynamic routing for public files
+app.use(express.static(__dirname + "/public"));
+
+
 const router = require("./API/routes.js");
 // router.get("/view", clientController.fetchAllClients);
 app.use(router);
