@@ -1,12 +1,12 @@
 const mysql = require('mysql');
 
 var pool = mysql.createPool({
-    connectionLimit: 100,
-    host: "",
-    user: "",
+    connectionLimit: 74,
+    host: "127.0.0.1",
+    user: "root",
     password: "",
-    database: "scrapmap",
-    debug: true
+    //port: 3306,
+    database: "scrapmap"
 });
 
 function executeQuery(query, params, callback) {

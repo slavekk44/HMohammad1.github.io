@@ -9,8 +9,9 @@
 
 
 
-// import client object 
-const user = require ('../objects/user.js');
+// import user + profile objects
+const User = require ('../objects/user.js');
+const Profile = require ('../objects/profile.js');
 
 const userDAO = require ('../DAOs/userDAO.js');
 const { response } = require('express');
@@ -18,7 +19,7 @@ const { response } = require('express');
 
 // hashing library and function
 const bcrypt = require("bcryptjs");
-function hashPassword(password) {
+function hashPassword(password, callback) {
     //set the complexity of the salt generation
     const saltRounds = 10;
     //generate random salt (to be added to the password to generate random hash)
@@ -27,13 +28,12 @@ function hashPassword(password) {
             throw err;
         } else {
             //hash the password using the generated salt
-            bcrypt.hash(pass, salt, function(err, hash) {
+            bcrypt.hash(password, salt, function(err, hash) {
                 if (err) {
                     throw err;
                 } else {
-                    //console.log(`hash -> ${hash}`);
                     //return the computed hash
-                    return hash;
+                    callback(err, hash);
                 }
             });
         }
@@ -48,22 +48,72 @@ const createAccount = (req, res) => {
         res.render("signup", {passwordError: true, message: "Passwords do not match"});
     }
 
-    // check if email already exists in DB
-    if(userDAO.emailExists(req.body.email)){
-        res.render("signup", {emailError: true, message: "This email is already linked to a Scrapmap account. <a href='/login'> Log-in here! </a>"});
+
+    try{
+        // check if email already exists in DB
+        if(userDAO.emailExists(req.body.email)){
+            res.render("signup", {emailError: true, message: "This email is already linked to a Scrapmap account. <a href='/login'> Log-in here! </a>"});
+        }
+
+
+        // check if username is already taken
+        if(userDAO.usernameExists(req.body.username)){
+            res.render("signup", {usernameError: true, message: "This username is already taken."});
+        }
+
+        // hash password -- callback prevents async errors
+        hashPassword(req.body.pw1, function(err, hash){
+
+            if(!err){
+                // generate a random userID
+                var userID; 
+                do{
+                    userID = Math.floor(Math.random() * 2147483646);
+ 
+                } while(userDAO.userIDexists(userID));
+                
+                // inputs validated so start inserts
+                if(userDAO.insertLogin(userID, req.body.username, req.body.email, hash)){
+                    if( userDAO.insertProfile(userID, req.body.disp_name, req.body.fname, req.body.lname)){
+                        userDAO.insertPFP(userID);
+                    }
+                }
+               
+                // retrive full user data from server
+                user = getUserByID(userID);
+
+                res.send(JSON.stringify(user));
+            }
+            else{
+                throw err;
+            }
+        });
+    }
+    catch(err){
+        console.log(err);
+        res.render("signup", {serverError: true, message: "Oops something went wrong. Please try again later."});
     }
 
-    // check if username is already taken
-    if(userDAO.usernameExists(req.body.username)){
-        res.render("signup", {usernameError: true, message: "This username is already taken."});
+}
+
+// returns a populated user object complete with profile -- if just a profile is needed user getProfile functions
+function getUserByID(userID){
+
+
+    try{
+        // fetch row from DB
+        data = userDAO.getUserByID(userID);
+        // create profile
+        var profile = new Profile(data.display, data.fname, data.lname, data.pfp, data.colour);
+        // create user object
+        var user = new User(userID, data.username, data.email, profile);
+        return user;
+    }
+    catch{
+        return false;
     }
 
-    // hash password
-    let hash = hashPassword(req.body.pw1);
 
-    // DAO request 
-
-    
 
 }
 
