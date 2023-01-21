@@ -1,5 +1,5 @@
 const { query } = require("express");
-const DB = require("queryHandler.js");
+const DB = require("./queryHandler");
 
 
 
