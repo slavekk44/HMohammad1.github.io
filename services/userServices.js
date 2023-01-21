@@ -12,7 +12,7 @@
 // import client object 
 const user = require ('../objects/user.js');
 
-const userDAO = require ('../db/userDAO.js');
+const userDAO = require ('../DAOs/userDAO.js');
 const { response } = require('express');
 
 
