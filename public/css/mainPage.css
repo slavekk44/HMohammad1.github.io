@@ -1,6 +1,7 @@
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box
 }
 body {font-family: Arial;}
 
@@ -17,10 +18,12 @@ body {font-family: Arial;}
     float: left;
     border: none;
     outline: none;
+    display: block;
     cursor: pointer;
     padding: 14px 16px;
     transition: 0.3s;
-    font-size: 17px;
+    font-size: 20px;
+    width: 50%;
 }
 
 /* Change background color of buttons on hover */

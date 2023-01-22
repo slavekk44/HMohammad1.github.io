@@ -3,34 +3,67 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script type = "text/javascript" src="/public/js/mainPage.js"></script>
-    <link rel = "stylesheet" href="test.css">
+    <link rel = "stylesheet" href="/public/css/mainPage.css">
 </head>
 <body>
+<div class="wrapper">
+    <div class="userDetails">
 
-<p>In this example, we use JavaScript to "click" on the London button, to open the tab on page load.</p>
+        <div class="tab">
+            <button class="tablinks" onclick="openPage(event, 'Login')">Login</button>
+            <button class="tablinks" onclick="openPage(event, 'Sign Up!')" id="defaultOpen">Sign Up</button>
+        </div>
 
-<div class="tab">
-    <button class="tablinks" onclick="openCity(event, 'London')" id="defaultOpen">London</button>
-    <button class="tablinks" onclick="openCity(event, 'Paris')">Paris</button>
-    <button class="tablinks" onclick="openCity(event, 'Tokyo')">Tokyo</button>
+        <div id="Sign Up!" class="tabcontent">
+            <form name="contact-details" action="API/signup" method="post">
+                <div class="personal-info">
+                    <div class="username">
+                        <input id="username" name="username" placeholder="Username"/>
+                        <input id="disp_name" name="disp_name" placeholder="Display Name"/>
+                    </div>
+                    <div class="contact-name">
+                        <input id="fname" name="fname" placeholder="First Name">
+                        <input id="lname" name="lname" placeholder="Last Name">
+                    </div>
+                    <div class="contact-details">
+                        <input id="email" name="email" placeholder="Email Address">
+                    </div>
+                </div>
+                <div class="password">
+                    <input id="pw1" name="pw1" placeholder="Password"/>
+                    <input id="pw2" name="pw2" placeholder="Confirm Password"/>
+                </div>
+                <div class="row">
+                    <input type="submit" name="submit"/>
+                </div>
+            </form>
+        </div>
+
+        <div id="Login" class="tabcontent">
+            <form name="login" action="API/login" method="post">
+                <div class="username">
+                    <input id="username2" name="username" placeholder="Username"/>
+                </div>
+                <div class="password">
+                    <input id="pw" name="pw1" placeholder="Password"/>
+                </div>
+                <div class="row">
+                    <input type="submit" name="submit"/>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="image" style="background-image: url('/Images/cool2.jpg')">
+
+    </div>
+
 </div>
 
-<div id="London" class="tabcontent">
-    <h3>London</h3>
-    <p>London is the capital city of England.</p>
-</div>
-
-<div id="Paris" class="tabcontent">
-    <h3>Paris</h3>
-    <p>Paris is the capital of France.</p>
-</div>
-
-<div id="Tokyo" class="tabcontent">
-    <h3>Tokyo</h3>
-    <p>Tokyo is the capital of Japan.</p>
-</div>
 
 
-
+<script>
+    document.getElementById("defaultOpen").click();
+</script>
 </body>
 </html>
