@@ -1,6 +1,6 @@
-class profile{
+class Profile{
 
-    profile(display, fname, lname, pfp, colour){
+    constructor(display, fname, lname, pfp, colour){
 
         this.display = display;
         this.fname = fname;
@@ -13,8 +13,4 @@ class profile{
 
 }
 
-module.exports = {
-
-    profile
-
-}
+module.exports = Profile;

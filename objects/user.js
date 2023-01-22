@@ -1,9 +1,7 @@
-const Profile = require("./profile");
-
-class user{
+class User{
 
     // create user object w/ existing profile
-    user(userID, username, email, profile){
+    constructor(userID, username, email, profile){
         
         this.userID = userID;
         this.username = username;
@@ -12,22 +10,7 @@ class user{
         
     }
 
-    // create user object and profile
-    user(userID, username, email, display, fname, lname, pfp, colour){
-
-        this.userID = userID;
-        this.username = username;
-        this.email = email;
-        this.profile = new Profile(display, fname, lname, pfp, colour);
-
-    }
-
-
-
 
 }
 
-module.exports = {
-    user
-
-}
+module.exports = User

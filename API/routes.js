@@ -11,6 +11,8 @@ const router = express.Router();
 //route for signups
 router.post("/API/signup", userServices.createAccount);
 
+router.post("/API/login", userServices.login);
+
 
 console.log("EXPORTING ROUTER");
 //export router

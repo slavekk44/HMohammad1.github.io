@@ -6,7 +6,8 @@ var pool = mysql.createPool({
     user: "root",
     password: "",
     //port: 3306,
-    database: "scrapmap"
+    database: "scrapmap",
+    debug: true
 });
 
 function executeQuery(query, params, callback) {

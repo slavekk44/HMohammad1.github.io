@@ -2,54 +2,51 @@ const { query } = require("express");
 const DB = require("./queryHandler");
 
 // creates a profile for the given userID
-function insertProfile(userID, d_n, fname, lname){
+function insertProfile(userID, d_n, fname, lname, callback){
 
     let query = "INSERT INTO user_profiles (userID, display_name, fname, lname) VALUES (?,?,?,?)";
     let params = [userID, d_n, fname, lname];
 
-    DB.executeQuery(query, params, function(err){
+    DB.executeQuery(query, params, function(err, rows){
         if(err){
-            throw err;
-            return false;
+            return callback(err, false);
         }
         else{
-            return true;
+            return callback(null, true);
         }
     });
 
 }
 
-// insert login details
-function insertLogin(userID, username, email, hash){
+// insert login details -- returns true on success
+function insertLogin(userID, username, email, hash, callback){
 
     let query = "INSERT INTO user_logins (userID, username, email, hash) VALUES (?,?,?,?)";
     let params = [userID, username, email, hash];
 
-    DB.executeQuery(query, params, function(err){
+    DB.executeQuery(query, params, function(err, rows){
         if(err){
-            throw err;
-            return false;
+            return callback(err, false)
         }
         else{
-            return true;
+            return callback(null, true);
         }
     });
 
 }
 
 // assign default pfp
-function insertPFP(userID){
+function insertPFP(userID, callback){
 
     let query = "INSERT INTO user_pfp (userID) VALUES (?)";
     let params = [userID];
 
-    DB.executeQuery(query, params, function(err){
+    DB.executeQuery(query, params, function(err, rows){
         if(err){
-            throw err;
-            return false;
+            return callback(err, false);
         }
         else{
-            return true;
+           return callback(null, true);
         }
     });
 
@@ -65,7 +62,7 @@ function logIP(userID){
 
 
 // return true if email exists
-function emailExists(email){
+function emailExists(email, callback){
 
     let query = "SELECT count(userID) AS count FROM user_logins WHERE email = ?";
     let params = [email];
@@ -73,21 +70,21 @@ function emailExists(email){
     DB.executeQuery(query, params, function(err, rows, fields){
         if(!err){
             if(rows[0].count == 0){
-                return false;
+                return callback(null, false)
             }
             else{
-                return true;
+                return callback(null, true);
             }
         }
         // connection / query failed -- throw error
         else{
-            throw(err);
+            return callback(err, null);
         }
 
     });
 }
 
-function usernameExists(username){
+function usernameExists(username, callback){
 
     let query = "SELECT count(userID) AS count FROM user_logins WHERE username = ?";
     let params = [username];
@@ -96,14 +93,14 @@ function usernameExists(username){
 
         if(!err){
             if(rows[0].count == 0){
-                return false;
+                return callback(null, false);
             }
             else{
-                return true;
+                return callback(null, true);
             }
         }
         else{
-            throw(err);
+            return callback(err, null);
         }
 
     });
@@ -133,8 +130,53 @@ function userIDexists(userID){
 
 }
 
+
+function fetchPaswordByEmail(email, callback){
+
+    let query = `SELECT userID, hash FROM user_logins WHERE email = ?`;
+    let params = [email];
+
+    DB.executeQuery(query, params, function(err, rows, fields){
+        if(!err){
+            // if empty set returned username doesn't exist
+            if(rows.length == 0){
+                return callback(false)
+            }
+            else{
+                return callback(rows[0]);
+            }
+        }
+        else{
+            throw err;
+        }
+    });
+
+}
+
+function fetchPaswordByUsername(username, callback){
+
+    let query = `SELECT userID, hash FROM user_logins WHERE username = ?`;
+    let params = [username];
+
+    DB.executeQuery(query, params, function(err, rows, fields){
+        if(!err){
+            // if empty set returned username doesn't exist
+            if(rows.length == 0){
+                callback(false);
+            }
+            else{
+                callback(rows[0]);
+            }
+        }
+        else{
+            throw err;
+        }
+    });
+
+}
+
 // returns all data for a user -- use getProfileByID to fetch user side details
-function getUserByID(userID){
+function getUserByID(userID, callback){
 
     let query = `
         SELECT  user_logins.username AS username,
@@ -154,7 +196,7 @@ function getUserByID(userID){
     DB.executeQuery(query, params, function(err, rows, fields){
 
         if(!err){
-            return rows[0];
+            return callback(rows[0]);
         }
         else{
 
@@ -167,6 +209,8 @@ function getUserByID(userID){
 module.exports = {
 
     getUserByID,
+    fetchPaswordByEmail,
+    fetchPaswordByUsername,
     emailExists,
     usernameExists,
     userIDexists,
