@@ -4,6 +4,14 @@ const session = require("cookie-session");
 //creating app
 const app = express();
 
+const {config} = require('dotenv');
+
+
+
+
+// get environment
+config({path: `.env.${process.env.NODE_ENV}`});
+
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -46,8 +54,31 @@ const router = require("./API/routes.js");
 // router.get("/view", clientController.fetchAllClients);
 app.use(router);
 
-//make the app listen on port
-const port = process.argv[2] || process.env.PORT || 3000;
-const server = app.listen(port, () => {
-  console.log(`Scrapmap listening at http://localhost:${port}`);
-});
+// server global
+var server;
+
+// try to assign port value
+const port = process.argv[2] || process.env.APP_PORT || 3000;
+
+// start listening at env port
+function startServer(){
+  //make the app listen on port
+  server = app.listen(port, () => {
+    console.log(`Scrapmap listening @ http://localhost:${port}`);
+  });
+}
+
+// kills currently running server
+function killServer(){
+  server.close(() =>{
+    console.log(`Scrapmap no longer listening @ http://localhost:${port}`);
+  });
+}
+
+startServer();
+
+// export functions for use elsewhere
+module.exports = {
+  startServer,
+  killServer
+}

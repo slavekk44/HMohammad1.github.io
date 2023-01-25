@@ -138,7 +138,7 @@ function fetchPaswordByEmail(email, callback){
 
     DB.executeQuery(query, params, function(err, rows, fields){
         if(!err){
-            // if empty set returned username doesn't exist
+            // if empty set returned email doesn't exist
             if(rows.length == 0){
                 return callback(false)
             }
