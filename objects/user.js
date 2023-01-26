@@ -1,13 +1,18 @@
 class User{
 
     // create user object w/ existing profile
-    constructor(userID, username, email, profile){
+    constructor(userID, email, profile){
         
         this.userID = userID;
-        this.username = username;
         this.email = email;
         this.profile = profile;
         
+    }
+
+    getCoords() {
+        // TESTING VARS ONLY
+        return [55.909095, -3.319584];
+
     }
 
 

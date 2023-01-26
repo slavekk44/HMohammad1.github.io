@@ -40,6 +40,10 @@ function hashPassword(password, callback) {
     });
 }
 
+function generateUserID(){
+
+    
+}
 
 const createAccount = (req, res) => {
 
@@ -100,6 +104,8 @@ const createAccount = (req, res) => {
                                                     else{
                                                         // retrive full user data from server
                                                         getUserByID(userID, function(user){
+                                                            // bind user to session
+                                                            req.session.user = user;
                                                             res.send(JSON.stringify(user));
                                                         });
                                                     }
@@ -129,9 +135,9 @@ function getUserByID(userID, callback){
         // fetch row from DB
         userDAO.getUserByID(userID, function(data){
             // create profile
-            var profile = new Profile(data.display, data.fname, data.lname, data.pfp, data.colour);
+            var profile = new Profile(data.username, data.display, data.fname, data.lname, data.pfp, data.colour);
             // create user object
-            var user = new User(userID, data.username, data.email, profile);
+            var user = new User(userID, data.email, profile);
             return callback(user);
         });
     }
@@ -139,6 +145,24 @@ function getUserByID(userID, callback){
         return callback(false);
     }
 
+
+
+}
+
+// return a user profile from their ID
+function getProfileByID(userID, callback){
+
+    try{
+        // fetch row from DB
+        userDAO.getProfileByID(userID, function(data){
+            // create profile
+            var profile = new Profile(data.display, data.fname, data.lname, data.pfp, data.colour);
+            return callback(profile);
+        });
+    }
+    catch{
+        return callback(false);
+    }
 
 
 }
@@ -191,7 +215,10 @@ const login = (req, res) => {
                 // get user object from the DB
                 getUserByID(result.userID, function(user){
                     console.log("Login success");
+                    // bind user to current session
+                    req.session.user = user;
                     res.send(JSON.stringify(user));
+                    
                 });
             }
 
@@ -205,6 +232,8 @@ const login = (req, res) => {
 module.exports = {
 
     createAccount,
-    login
+    login,
+    getProfileByID,
+    
 
 }
