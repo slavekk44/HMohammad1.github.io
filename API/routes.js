@@ -14,11 +14,9 @@ router.post("/API/signup", userServices.createAccount);
 router.post("/API/login", userServices.login);
 
 // route to get & create a post
-router.get("/API/post/:ID", function(req, res){
-    postServices.getPostByID(req.params.ID);
-});
+router.get("/API/post/:ID", postServices.getPostByID);
 
-//router.post("/API/upload", postServices.createPost());
+router.post("/API/upload", postServices.createPost);
 
 
 console.log("EXPORTING ROUTER");

@@ -105,9 +105,11 @@ function getPostByID(postID, callback){
     DB.executeQuery(query, params, function(err, rows, fields){
 
         if(!err){
-            return callback(null, rows[0]);
+            console.log(rows);
+            return callback(false, rows[0]);
         }
         else{
+            console.log(err);
             return callback(err, false);
         }
 

@@ -223,7 +223,7 @@ function getProfileByID(userID, callback){
     let params = [userID];
 
     DB.executeQuery(query, params, function(err, rows, fields){
-
+        
         if(!err){
             return callback(rows[0]);
         }

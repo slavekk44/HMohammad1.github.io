@@ -1,11 +1,12 @@
 // import user + profile objects
 var User = require ('../objects/user.js');
 var Profile = require ('../objects/profile.js');
+var Post = require('../objects/post.js');
 
 const session = require("express-session");
 
 const userServices = require('../services/userServices.js');
-const app = require('../app.js').app;
+const app = require('../app.js');
 
 const postDAO = require ('../DAOs/postDAO.js');
 const { res } = require('express');
@@ -37,75 +38,75 @@ function uploadMedia(postID, data, links){
 }
 
 
-// // create a new post
-// const createPost = (req, res) => {
+// create a new post
+const createPost = (req, res) => {
 
-//     // generate a new postID
-//     var postID;
-//     do{
-//         postID = Math.floor(Math.random() * 2147483646);
+    // generate a new postID
+    var postID;
+    do{
+        postID = Math.floor(Math.random() * 2147483646);
 
-//     } while(postDAO.postIDexists(postID));
+    } while(postDAO.postIDexists(postID));
 
-//     // get current location of user
-//     // if(req.session != null && req.session.user){
-//     //     var user = req.session.user;
-//     //     coords = user.getCoords();
-//     //     userID = user.userID;
-//     // }
-//     // else{
-//     //     res.send("You must be logged in to create a post");
-//     // }
+    // get current location of user
+    if(req.session != null && req.session.user){
+        var user = req.session.user;
+        coords = user.getCoords();
+        userID = user.userID;
+    }
+    else{
+        res.send("You must be logged in to create a post");
+    }
 
-//     // parse form data 
-//     const form = new formidable.IncomingForm();
-//     form.parse(req, function(err, fields, files){
+    // parse form data 
+    const form = new formidable.IncomingForm();
+    form.parse(req, function(err, fields, files){
 
-//         // make directory for new post
-//         mkdir(`/public/img/${postID}`);
+        // make directory for new post
+        mkdir(`/public/img/${postID}`);
 
-//         // init array for holding uploaded paths
-//         links = array();
+        // init array for holding uploaded paths
+        links = array();
 
-//         // try and upload each file
-//         files.forEach(media =>{
+        // try and upload each file
+        files.forEach(media =>{
             
-//             try{
-//                 uploadMedia(postID, media, links);
-//             }
-//             catch (err){
-//                 throw err;
-//             }
-//         });
+            try{
+                uploadMedia(postID, media, links);
+            }
+            catch (err){
+                throw err;
+            }
+        });
 
 
-//         // if all files uploaded okay then insert links to DB
-//         postDAO.insertPostMedia(postID, links, function(err, result){
+        // if all files uploaded okay then insert links to DB
+        postDAO.insertPostMedia(postID, links, function(err, result){
 
-//             if(err){
-//                 throw err;
-//             }
-//             else{
+            if(err){
+                throw err;
+            }
+            else{
 
-//                 // fetch newly created post and display
-//                 getPostByID(postID, function(post){
-//                     res.send(JSON.stringify(post));
-//                 });
-//             }
+                // fetch newly created post and display
+                getPostByID(postID, function(post){
+                   return res.send(JSON.stringify(post));
+                });
+            }
 
-//         });
+        });
 
-//     });
+    });
 
 
-// }
+}
 
 
 // fetch all media associated with a post and return them as a link of arrays
-function getPostMedia(postID){
+function getPostMedia(postID, callback){
 
     // init array
-    links = array();
+    var links = [];
 
     postDAO.getPostMediaByID(postID, function(err, rows){
 
@@ -118,7 +119,7 @@ function getPostMedia(postID){
             });
 
             // return populated array
-            return links;
+            return callback(links);
 
         }
         else{
@@ -133,36 +134,47 @@ function getPostMedia(postID){
 // returns a post object complete with poster profile
 const getPostByID = (req, res) => {
 
+    // postID from the GET request
+    postID = req.params.ID;
+
     try{
 
-        postDAO.getPostByID(postID, function(data){
+        postDAO.getPostByID(postID, function(err, postData){
+            // error check
+            if(!err){
 
-            // assign userID
-            userID = data.userID;
-            // fetch profile from DB
-            userDAO.getProfileByID(userID, function(err, data){
+                // post doesn't exist -- 404
+                if(postData === undefined){
+                    return res.send("404");
+                }
 
-                if(!err){
+                console.log(postData);
 
-                    // create profile
-                    var profile = new Profile(data.display, data.fname, data.lname, data.pfp, data.colour);
+                // assign userID
+                userID = postData.userID;
+
+                // get profile
+                userServices.getProfileByID(userID, function(profile){
 
                     // fetch media links
-                    let links = getPostMedia(postID);
+                    getPostMedia(postID, function(links){;
 
-                    // create post w/ profile & media links
-                    var post = new Post(postID, [data.lat, data.long], links, data.descr, data.posted, profile);
+                        // create post w/ profile & media links
+                        var post = new Post(postID, [postData.lat, postData.long], links, postData.descr, postData.posted, profile);
 
-                    res.send(JSON.stringify(post));
-                }
-                else{
-                    throw err;
-                }
-            });
+                        res.send(JSON.stringify(post));
+                    });
+                });
+
+            }
+            else{
+                console.log(err);
+                throw err;
+            }
         });
     }
     catch(err){
-        return callback(false);
+        return res.send(err);
     }
 
 }
@@ -170,6 +182,7 @@ const getPostByID = (req, res) => {
 
 module.exports = {
 
-    getPostByID
+    getPostByID,
+    createPost
 
 }

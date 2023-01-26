@@ -53,7 +53,6 @@ app.use(express.static(__dirname + "/public"));
 
 
 const router = require("./API/routes.js");
-// router.get("/view", clientController.fetchAllClients);
 app.use(router);
 
 // server global
