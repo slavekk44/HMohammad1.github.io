@@ -106,7 +106,10 @@ const createAccount = (req, res) => {
                                                         getUserByID(userID, function(user){
                                                             // bind user to session
                                                             req.session.user = user;
-                                                            res.send(JSON.stringify(user));
+                                                            req.session.save();
+
+                                                            // returns output as string
+                                                            res.send(render("sideMenu", {user: user}));
                                                         });
                                                     }
                                                 });
@@ -217,6 +220,7 @@ const login = (req, res) => {
                     console.log("Login success");
                     // bind user to current session
                     req.session.user = user;
+                    req.session.save();
                     res.send(JSON.stringify(user));
                     
                 });

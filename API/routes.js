@@ -18,7 +18,7 @@ router.get("/API/post/:ID", function(req, res){
     postServices.getPostByID(req.params.ID);
 });
 
-router.post("/API/upload", postServices.createPost());
+//router.post("/API/upload", postServices.createPost());
 
 
 console.log("EXPORTING ROUTER");

@@ -1,6 +1,6 @@
 const express = require("express");
 var bodyParser = require("body-parser");
-const session = require("cookie-session");
+const session = require("express-session");
 //creating app
 const app = express();
 
@@ -22,8 +22,10 @@ app.use(bodyParser.json());
 app.use(
   session({
     secret: "f00bar",
-    user: "TESTING",
-    maxAge: 60 * 1000 * 60 * 24 //24HRS
+    user: false,
+    maxAge: 60 * 1000 * 60 * 24, //24HRS
+    saveUninitialized: true,
+    resave: true
   })
 );
 
