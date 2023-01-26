@@ -92,7 +92,7 @@ const createAccount = (req, res) => {
                                         throw err;
                                     }
                                     else{
-                                        userDAO.insertProfile(userID, req.body.username, req.body.disp_name, req.body.fname, req.body.lname, function(err, result){
+                                        userDAO.insertProfile(userID, req.body.disp_name, req.body.fname, req.body.lname, function(err, result){
                                             if(!result){
                                                 throw err;
                                             }
@@ -109,7 +109,7 @@ const createAccount = (req, res) => {
                                                             req.session.save();
 
                                                             // returns output as string
-                                                            res.send(render("sideMenu", {user: user}));
+                                                            res.send(JSON.stringify(user));
                                                         });
                                                     }
                                                 });
