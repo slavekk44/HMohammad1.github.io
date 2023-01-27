@@ -15,7 +15,7 @@ var Profile = require ('../objects/profile.js');
 
 const userDAO = require ('../DAOs/userDAO.js');
 const { res } = require('express');
-
+const session = require("express-session");
 
 // hashing library and function
 const bcrypt = require("bcryptjs");
@@ -137,6 +137,7 @@ function getUserByID(userID, callback){
     try{
         // fetch row from DB
         userDAO.getUserByID(userID, function(data){
+            
             // create profile
             var profile = new Profile(data.username, data.display, data.fname, data.lname, data.pfp, data.colour);
             // create user object
@@ -231,13 +232,146 @@ const login = (req, res) => {
 
 }
 
+// destroy the current session and return to index
+const logout = (req, res) =>{
+
+    req.session.destroy();
+    // send back to index
+    return res.render("index");
+
+}
+
+
+// sends a friend request from the current session user using userIDs
+const sendFriendRequest = (req, res) => {
+
+    // check user is logged in
+    if(req.session.user === undefined){
+        return res.send("You must be logged in to send a friend request");
+    }
+
+    var userID = req.session.user.userID;
+    var sendTo = req.params.sendTo;
+    
+    userDAO.insertFriendRequest(userID, sendTo, function(result){
+
+        if(result){
+            res.send("Request succesfully sent");
+        }
+        else{
+            throw err;
+        }
+
+    });
+
+    
+
+
+}
+
+// accepts / declines an existing friend request
+const updateFriendRequest = (req, res) =>{
+
+        // check user is logged in
+        if(req.session.user === undefined){
+            return res.send("You must be logged in to update a friend request");
+        }
+    
+        var reqID = req.body.reqID;
+        var status = req.body.status;
+        
+        userDAO.updateFriendRequest(reqID, status, function(result){
+    
+            if(result){
+                res.send("Request succesfully updated");
+            }
+            else{
+                throw err;
+            }
+    
+        });
+
+}
+
+// removes another user from the current session users friends list
+const removeFriend = (req, res) =>{
+        // check user is logged in
+        if(req.session.user === undefined){
+            return res.send("You must be logged in to remove a friend");
+        }
+    
+        var userID = req.session.user.userID;
+        var toRemove = req.params.remove;
+        
+        userDAO.updateFriendRequest(userID, toRemove, function(result){
+    
+            if(result){
+                res.send(`User #${toRemove} removed from your friends list`);
+            }
+            else{
+                throw err;
+            }
+    
+        });
+}
+
+
+// returns an array of profiles that correspond to all the current user's friends
+const getFriendProfiles = (req,res) =>{
+
+    // check user is logged in
+    if(req.session.user === undefined){
+        return res.send("You must be logged in.");
+    }
+
+    var userID = req.session.user.userID;
+    
+    userDAO.fetchAllFriendIDs(userID, function(err, rows){
+
+        if(!err){
+
+            // init array
+            var friendProfiles = [];
+
+            // for each returned ID fetch the corresponding profile
+            rows.forEach(row => {
+
+                // get the profile
+                getProfileByID(row.userID, function(profile){
+                    // only push successfully retrieved profiles
+                    if(profile){
+                       
+                        friendProfiles.push(profile);
+
+                    }
+                });
+            });
+
+            // return populated friend array
+            res.send(JSON.stringify(friendProfiles));
+
+        }
+        else{
+            throw err;
+        }
+
+    });
+
+
+}
+
 
 // export member functions for use elsewhere
 module.exports = {
 
     createAccount,
     login,
+    logout,
     getProfileByID,
+    sendFriendRequest,
+    updateFriendRequest,
+    removeFriend,
+    getFriendProfiles
     
 
 }

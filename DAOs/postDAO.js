@@ -117,6 +117,47 @@ function getPostByID(postID, callback){
 
 }
 
+function addPostComment(postID, userID, comment){
+
+    let query = `INSERT INTO post_comments (postID, comment_from, text) VALUES (?,?,?)`;
+    let params = [postID, userID, comment];
+
+    DB.executeQuery(query, params, function(err, rows, fields){
+
+        if(!err){
+            console.log(rows);
+            return callback(true);
+        }
+        else{
+            console.log(err);
+            return callback(false);
+        }
+
+    });
+
+
+}
+
+// get all comments and their associated userIDs
+function getPostComments(postID){
+
+    let query = `SELECT text AS TEXT, comment_from as userID FROM post_comments WHERE postID = ?`
+    let params = [postID];
+
+    DB.executeQuery(query, params, function(err, rows, fields){
+
+        if(!err){
+            return callback(rows);
+        }
+        else{
+            console.log(err);
+            return callback(false);
+        }
+
+    });
+
+}
+
 
 module.exports = {
 
@@ -124,6 +165,8 @@ module.exports = {
     getPostByID,
     insertPost,
     insertPostMedia,
-    getPostMediaByID
+    getPostMediaByID,
+    addPostComment,
+    getPostComments
 
 }

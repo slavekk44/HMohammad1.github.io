@@ -180,9 +180,66 @@ const getPostByID = (req, res) => {
 }
 
 
+const addComment = (req, res) =>{
+
+    // get vars from POST
+    var userID = req.body.userID;
+    var postID = req.body.postID;
+    var comment = req.body.comment;
+
+    postDAO.addComment(postID, userID, comment, function(result){
+
+        if(result){
+            res.send("comment succesfully posted");
+        }
+        else{
+            res.send(500);
+        }
+    });
+
+};
+
+// returns an array of 
+const getPostComments = (req, res) =>{
+
+    var postID = req.params.postID;
+
+
+    postDAO.getPostComments(postID, function(rows){
+
+        // error check
+        if(!rows){
+            res.send(500);
+        }
+        else{
+
+            // init comment array
+            comments = [];
+
+            rows.forEach(row =>{
+
+                // fetch profile for commenter
+                userServices.getProfileByID(row.userID, function(profile){
+
+                    comments.push([rows.text, profile]);
+
+                });
+            });
+
+            // return populated comment array
+            res.send(JSON.stringify(comments));
+
+        }
+    });
+
+}
+
+
 module.exports = {
 
     getPostByID,
-    createPost
+    createPost,
+    addComment,
+    getPostComments
 
 }

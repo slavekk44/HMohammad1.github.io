@@ -235,6 +235,98 @@ function getProfileByID(userID, callback){
 }
 
 
+function insertFriendRequest(sentBy, sentTo, callback){
+
+    let query = `INSERT INTO friend_requests (req_from, req_to) VALUES (?,?)`;
+    let params = [sentBy, sentTo];
+
+    DB.executeQuery(query, params, function(err, rows, fields){
+        
+        if(!err){
+            return callback(true);
+        }
+        else{
+
+            throw err;
+        }
+    });
+
+
+}
+
+
+function updateFriendRequest(reqID, status, callback){
+
+    let query = `UPDATE friend_requests SET accepted = ? WHERE requestID=?`;
+    let params = [status, reqID];
+
+    DB.executeQuery(query, params, function(err, rows, fields){
+        
+        if(!err){
+            return callback(true);
+        }
+        else{
+
+            throw err;
+        }
+    });
+
+
+}
+
+
+function deleteFriendRequest(user1, user2, callback){
+
+    let query = `DELETE * FROM friend_requests WHERE (req_from = ? AND req_to = ?) OR (req_from = ? AND req_to = ?)`;
+    // swap param order for each or 
+    let params = [user1, user2, user2, user1];
+
+    DB.executeQuery(query, params, function(err, rows, fields){
+        
+        if(!err){
+            return callback(true);
+        }
+        else{
+
+            throw err;
+        }
+    });
+
+
+}
+
+// returns userIDs for a users friends list 
+function fetchAllFriendIDs(userID){
+
+    let query = `SELECT req_from AS userID 
+                 FROM friend_requests
+                 WHERE req_to = ? AND accepted = 1
+                 
+                 UNION ALL
+                 
+                 SELECT req_to AS userID
+                 FROM friend_requests
+                 WHERE req_from = ? AND accepted = 1
+                 `;
+
+    let params = [userID, userID];
+
+    DB.executeQuery(query, params, function(err, rows, fields){
+        
+        if(!err){
+            return callback(null, rows);
+        }
+        else{
+
+            return callback(err, null);
+        }
+    });
+
+}
+
+
+
+
 module.exports = {
 
     getUserByID,
@@ -246,5 +338,9 @@ module.exports = {
     userIDexists,
     insertLogin,
     insertProfile,
-    insertPFP
+    insertPFP,
+    insertFriendRequest,
+    updateFriendRequest,
+    deleteFriendRequest,
+    fetchAllFriendIDs
 }
