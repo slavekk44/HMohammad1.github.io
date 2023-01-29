@@ -47,6 +47,14 @@ app.get("/signup", (req, res) => {
     res.render("signup");
 });
 
+app.get("/application", (req, res) => {
+    res.render("application");
+});
+
+app.get("/addPost", (req, res) => {
+    res.render("addPost");
+});
+
 
 //dynamic routing for public files
 app.use(express.static(__dirname + "/public"));

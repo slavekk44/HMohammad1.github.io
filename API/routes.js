@@ -12,6 +12,8 @@ const router = express.Router();
 //route for signups & login
 router.post("/API/signup", userServices.createAccount);
 router.post("/API/login", userServices.login);
+router.get("/API/logout", userServices.logout);
+
 
 // route to get & create a post
 router.get("/API/post/:ID", postServices.getPostByID);

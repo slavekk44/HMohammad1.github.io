@@ -109,7 +109,8 @@ const createAccount = (req, res) => {
                                                             req.session.save();
 
                                                             // returns output as string
-                                                            res.send(JSON.stringify(user));
+                                                            //res.send(JSON.stringify(user));
+                                                            res.render("application", {user: user});
                                                         });
                                                     }
                                                 });
@@ -126,7 +127,7 @@ const createAccount = (req, res) => {
     }
     catch(err){ 
         console.log(err);
-        return res.render("signup", {serverError: true, message: "Oops something went wrong. Please try again later."});
+        return res.render("application", {serverError: true, message: "Oops something went wrong. Please try again later."});
     }
 }
 
@@ -222,8 +223,9 @@ const login = (req, res) => {
                     // bind user to current session
                     req.session.user = user;
                     req.session.save();
-                    res.send(JSON.stringify(user));
-                    
+                    //res.send(JSON.stringify(user));
+                    res.render("application", {user: user});
+
                 });
             }
 
