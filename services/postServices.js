@@ -65,7 +65,7 @@ const createPost = (req, res) => {
         // make directory for new post
         mkdir(`/public/img/${postID}`);
 
-        postDAO.insertPost(postID, userID, fields.description, coords[0], coords[1], function(){
+        postDAO.insertPost(postID, userID, fields.title, fields.description, coords[0], coords[1], function(){
 
             // init array for holding uploaded paths
             links = array();
