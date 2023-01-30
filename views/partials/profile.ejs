@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type = "text/javascript" src="/services/userServices.js"></script>
+    <script type ="text/javascript" src="/public/js/application.js"></script>
+    <link rel = "stylesheet" href="/css/profile.css">
+</head>
+<body>
+
+    <div class="profile">
+        <div class="btn-text-left">
+            <button class="left-aligned" onclick="off()">Off</button>
+        </div>
+
+        <div class="btn-text-right">
+
+            <a href="/API/logout">log out</a>
+        </div>
+
+        <div>
+            <img src="/Images/ok.jpg" alt="Italian Trulli" class="centre">
+        </div>
+
+        <h2><%= user.profile.display%></h2>
+
+        <p> Hey welcome to my page!</p>
+
+
+        <section style="padding-top: 20px">
+            <div class="btn-text-left">
+                <button class="left-aligned">Friends</button>
+            </div>
+            <div class="btn-text-right">
+                <button class="left-right-aligned">Scraps</button>
+            </div>
+        </section>
+
+
+    </div>
+
+
+
+</body>
+</html>

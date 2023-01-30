@@ -47,6 +47,14 @@ app.get("/signup", (req, res) => {
     res.render("signup");
 });
 
+app.get("/application", (req, res) => {
+    res.render("application");
+});
+
+app.get("/addPost", (req, res) => {
+    res.render("addPost");
+});
+
 
 //dynamic routing for public files
 app.use(express.static(__dirname + "/public"));
@@ -61,18 +69,20 @@ var server;
 // try to assign port value
 const port = process.argv[2] || process.env.APP_PORT || 3000;
 
+const host = process.env.APP_HOST || 'localhost';
+
 // start listening at env port
 function startServer(){
   //make the app listen on port
-  server = app.listen(port, () => {
-    console.log(`Scrapmap listening @ http://localhost:${port}`);
+  server = app.listen(port, host, () => {
+    console.log(`Scrapmap listening @ http://${host}:${port}/`);
   });
 }
 
 // kills currently running server
 function killServer(){
   server.close(() =>{
-    console.log(`Scrapmap no longer listening @ http://localhost:${port}`);
+    console.log(`Scrapmap no longer listening @ http://${host}:${port}/`);
   });
 }
 
