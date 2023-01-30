@@ -10,10 +10,11 @@
     <div class="profile">
         <h2>Create a Post</h2>
         <div class="postDetails">
-            <form name="createPost">
+            <form name="createPost" action="/API/upload" method="post">
                 <input id="title" name="title" placeholder="Title"/>
-                <input id="image" name="image" placeholder="Add Image"/>
+                <input type="file" id="myfile" name="myfile">
                 <input id="description" name="description" placeholder="Description"/>
+                <input type="submit">
             </form>
         </div>
 

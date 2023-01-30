@@ -51,7 +51,8 @@ const createPost = (req, res) => {
     // get current location of user
     if(req.session != null && req.session.user){
         var user = req.session.user;
-        coords = user.getCoords();
+        coords = [55.909095, -3.319584]
+        //coords = user.getCoords();
         userID = user.userID;
     }
     else{
