@@ -20,6 +20,7 @@
     "pretest": "",
     "posttest": "",
     "dev": "cross-env NODE_ENV=dev nodemon app.js",
+    "devserver": "cross-env NODE_ENV=devserver node app.js",
     "prod": "cross-env NODE_ENV=prod node app.js"
   },
   "repository": {
