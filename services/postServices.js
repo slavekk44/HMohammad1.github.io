@@ -65,34 +65,38 @@ const createPost = (req, res) => {
         // make directory for new post
         mkdir(`/public/img/${postID}`);
 
-        // init array for holding uploaded paths
-        links = array();
+        postDAO.insertPost(postID, userID, fields.description, coords[0], coords[1], function(){
 
-        // try and upload each file
-        files.forEach(media =>{
-            
-            try{
-                uploadMedia(postID, media, links);
-            }
-            catch (err){
-                throw err;
-            }
-        });
+            // init array for holding uploaded paths
+            links = array();
+
+            // try and upload each file
+            files.forEach(media =>{
+                
+                try{
+                    uploadMedia(postID, media, links);
+                }
+                catch (err){
+                    throw err;
+                }
+            });
 
 
-        // if all files uploaded okay then insert links to DB
-        postDAO.insertPostMedia(postID, links, function(err, result){
+            // if all files uploaded okay then insert links to DB
+            postDAO.insertPostMedia(postID, links, function(err, result){
 
-            if(err){
-                throw err;
-            }
-            else{
+                if(err){
+                    throw err;
+                }
+                else{
 
-                // fetch newly created post and display
-                getPostByID(postID, function(post){
-                   return res.send(JSON.stringify(post));
-                });
-            }
+                    // fetch newly created post and display
+                    getPostByID(postID, function(post){
+                    return res.send(JSON.stringify(post));
+                    });
+                }
+
+            });
 
         });
 

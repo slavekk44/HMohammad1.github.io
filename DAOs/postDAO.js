@@ -2,10 +2,10 @@ const { query } = require("express");
 const DB = require("./queryHandler");
 
 // inserts a post with the given postID
-function insertPost(postID, userID, lat, long, callback){
+function insertPost(postID, userID, desc, lat, long, callback){
 
-    let query = "INSERT INTO posts (postID, userID, lat, long) VALUES (?,?,?,?)"
-    let params = [postID, userID, lat, long];
+    let query = "INSERT INTO posts (postID, userID, descr, lat, long) VALUES (?,?,?,?,?)"
+    let params = [postID, userID, desc, lat, long];
     DB.executeQuery(query, params, function(err, rows){
         if(err){
             return callback(err, false);
