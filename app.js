@@ -1,3 +1,7 @@
+const readline = require("readline").createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 const express = require("express");
 var bodyParser = require("body-parser");
 const session = require("express-session");
@@ -86,7 +90,27 @@ function killServer(){
   });
 }
 
+// handle commands
+function cmd() {
+  readline.question("> ", (res) => {
+    if (res)
+      switch (res.toLowerCase()) {
+        case "exit":
+          // Stop http server
+          server.close(() => {
+            // End process
+            process.exit(0);
+          });
+          break;
+        // Add other commands here
+      }
+
+    cmd();
+  });
+}
+
 startServer();
+cmd();
 
 // export functions for use elsewhere
 module.exports = {
