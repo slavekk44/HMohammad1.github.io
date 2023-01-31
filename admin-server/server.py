@@ -5,6 +5,7 @@ from os.path import join
 from flask import Flask
 import subprocess
 import json
+import time
 
 app = Flask(__name__)
 
@@ -46,14 +47,36 @@ def serverstop():
 	print("Stopped server")
 	return json.dumps({"msg": "Server stopped"}), 200, {'Content-Type': 'application/json'}
 
-@app.route("/api/serverrunning")
-def serverrunning():
+@app.route("/api/serverrestart")
+def serverrestart():
+	global server_running
+
+	if server_running:
+		print("Stopping server for restart...")
+		subprocess.run(["./stop_server.sh"], cwd=scripts_folder, capture_output=True)
+
+		while server_running:
+			print("Waiting for server to shut down...")
+			isServerRunning()
+			time.sleep(1)
+
+	return serverstart()
+
+def isServerRunning():
 	global server_running
 
 	res = subprocess.run("screen -ls | grep scrapmap-main", shell=True, capture_output=True)
 
 	# Return code 0 means grep did not fail, therefor the screen exists and the server is running
 	server_running = res.returncode == 0
+
+	return server_running
+
+@app.route("/api/serverrunning")
+def serverrunning():
+	global server_running
+
+	isServerRunning()
 
 	return json.dumps({"running": server_running}), 200, {'Content-Type': 'application/json'}
 
