@@ -85,19 +85,23 @@ def serverrunning():
 def gitpull():
 	res = subprocess.run(["git", "pull"], capture_output=True)
 
-	print("Git pull:")
-	print(res)
+	msg = res.decode('utf-8').replace('\n', '<br>')
 
-	return json.dumps({"msg": res}), 200, {'Content-Type': 'application/json'}
+	print("Git pull:")
+	print(msg)
+
+	return json.dumps({"msg": msg}), 200, {'Content-Type': 'application/json'}
 
 @app.route("/api/gitstatus")
 def gitstatus():
 	res = subprocess.run(["git", "status"], capture_output=True)
 
-	print("Git status:")
-	print(res)
+	msg = res.decode('utf-8').replace('\n', '<br>')
 
-	return json.dumps({"msg": rses}), 200, {'Content-Type': 'application/json'}
+	print("Git status:")
+	print(msg)
+
+	return json.dumps({"msg": msg}), 200, {'Content-Type': 'application/json'}
 
 # Start server
 if __name__ == "__main__":
