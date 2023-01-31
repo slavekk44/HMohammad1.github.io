@@ -9,10 +9,6 @@ import time
 
 app = Flask(__name__)
 
-pagef = open('index.html', 'r')
-page = pagef.read()
-pagef.close()
-
 main_folder = join(getcwd(), "../")
 scripts_folder = join(getcwd(), "scripts/")
 
@@ -20,6 +16,10 @@ server_running = False
 
 @app.route("/")
 def index_page():
+	pagef = open('index.html', 'r')
+	page = pagef.read()
+	pagef.close()
+
 	return page, 200, {'Content-Type': 'text/html'}
 
 @app.route("/api/serverstart")
@@ -85,7 +85,7 @@ def serverrunning():
 def gitpull():
 	res = subprocess.run(["git", "pull"], capture_output=True)
 
-	msg = res.decode('utf-8').replace('\n', '<br>')
+	msg = res.stdout.decode('utf-8').replace('\n', '<br>')
 
 	print("Git pull:")
 	print(msg)
@@ -96,7 +96,7 @@ def gitpull():
 def gitstatus():
 	res = subprocess.run(["git", "status"], capture_output=True)
 
-	msg = res.decode('utf-8').replace('\n', '<br>')
+	msg = res.stdout.decode('utf-8').replace('\n', '<br>')
 
 	print("Git status:")
 	print(msg)

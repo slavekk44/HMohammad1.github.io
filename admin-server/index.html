@@ -8,7 +8,7 @@
 <style type="text/css">
 
 * {
-	padding: 0;
+	padding: 0.5em 0;
 	margin: 0;
 }
 
@@ -16,14 +16,43 @@ body {
 	font-family: monospace;
 }
 
+h1 {
+	font-size: 3em;
+}
+
+h3 {
+	font-size: 2em;
+}
+
+h1, h3 {
+	text-align: center;
+}
+
 div.content-container {
 	max-width: 800px;
 
-	margin: 20px auto 0 auto;
+	margin: 5px auto 0 auto;
 }
 
-p, pre {
-	margin: 0.5em;
+hr {
+	padding: 0;
+	margin: 0.5em auto;
+
+	width: 75%;
+}
+
+p#status {
+	font-size: 1.5em;
+	text-align: center;
+}
+
+pre#git-output {
+	margin-top: 1.5em;
+	padding: 1em 2em;
+
+	border: 2px solid #0007;
+
+	background-color: #0001;
 }
 
 button {
@@ -35,6 +64,11 @@ button {
 	border: 2px solid #0007;
 
 	background-color: #0001;
+
+	cursor: pointer;
+}
+button:hover {
+	background-color: #0002;
 }
 
 button#start-stop::after {
@@ -52,6 +86,8 @@ const updateInterval = 2000; // ms
 
 var running;
 
+var statusElem;
+
 const req = (url, callback) => {
 	fetch(url).then((res)=>res.json()).then((data)=>{callback(data)});
 };
@@ -60,8 +96,7 @@ function updateServerStatus() {
 	req("/admin/api/serverrunning", (data) => {
 		running = data.running;
 
-		let statusElem = document.getElementById('status');
-		statusElem.innerText = "Server " + (running ? "running" : "not running");
+		statusElem.innerHTML = running ? "&#128994; Server running" : "&#128308; Server not running";
 
 		let startStopButton = document.getElementById('start-stop');
 		if (running)
@@ -72,6 +107,8 @@ function updateServerStatus() {
 }
 
 function startStopServer() {
+	statusElem.innerHTML = "Server status loading &#10227;";
+
 	req(running ? "/admin/api/serverstop" : "/admin/api/serverstart", (data) => {
 		updateServerStatus();
 		if (data && data.msg) console.log(data.msg);
@@ -79,6 +116,8 @@ function startStopServer() {
 }
 
 function restartServer() {
+	statusElem.innerHTML = "Server status loading &#10227;";
+
 	req("/admin/api/serverrestart", (data) => {
 		console.log(data);
 	});	
@@ -91,18 +130,20 @@ function gitPull() {
 }
 
 function gitStatus() {
-	req("/admin/api/gitpull", (data) => {
+	req("/admin/api/gitstatus", (data) => {
 		prt(data.msg);
 	});
 }
 
 function prt(msg) {
-	let elem = document.getElementById('git-status');
+	let elem = document.getElementById('git-output');
 
-	elem.innerText = msg;
+	elem.innerHTML = msg;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+	statusElem = document.getElementById('status');
+
 	// Initial update
 	updateServerStatus();
 
@@ -116,18 +157,28 @@ document.addEventListener('DOMContentLoaded', () => {
 <body>
 
 <div class="content-container">
-<p id="status">(Server status)</p>
-<button id="start-stop" onclick="startStopServer()"></button>
-<button id="restart" onclick="restartServer()">Restart Server</button>
+
+<h1>&#127757;ScrapMap Server Admin</h1>
+
+<p id="status">Server status loading &#10227;</p>
+
+<h3>Server Controls</h3>
+<center>
+	<button id="start-stop" onclick="startStopServer()"></button>
+	<button id="restart" onclick="restartServer()">Restart Server</button>
+</center>
 <!-- <br>
 <button onclick="updateServerStatus()">Update Page</button> -->
 
 <hr>
 
-<button id="git-pull" onclick="gitPull()">Git Pull</button>
-<button id="git-status" onclick="gitStatus()">Git Status</button>
+<h3>Git Controls</h3>
+<center>
+	<button id="git-pull" onclick="gitPull()">Git Pull</button>
+	<button id=="git-status" onclick="gitStatus()">Git Status</button>
+</center>
 
-<pre id="git-status">(Git status)</pre>
+<pre id="git-output">(Command output)</pre>
 
 </div>
 
