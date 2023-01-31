@@ -161,7 +161,7 @@ function getProfileByID(userID, callback){
         // fetch row from DB
         userDAO.getProfileByID(userID, function(data){
             // create profile
-            var profile = new Profile(data.display, data.fname, data.lname, data.pfp, data.colour);
+            var profile = new Profile(data.username, data.display, data.fname, data.lname, data.pfp, data.colour);
             return callback(profile);
         });
     }
