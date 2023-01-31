@@ -51,16 +51,16 @@ const createPost = (req, res) => {
 
     } while(postDAO.postIDexists(postID));
 
-    // // get current location of user
-    // if(req.session != null && req.session.user){
-    //     var user = req.session.user;
-    //     coords = [55.909095, -3.319584];
-    //     //coords = user.getCoords();
-    //     userID = user.userID;
-    // }
-    // else{
-    //     res.send("You must be logged in to create a post");
-    // }
+    // get current location of user
+    if(req.session != null && req.session.user){
+        var user = req.session.user;
+        coords = [55.909095, -3.319584];
+        //coords = user.getCoords();
+        userID = user.userID;
+    }
+    else{
+        res.send("You must be logged in to create a post");
+    }
 
     // make directory for new post
     fs.mkdir(path.join(__dirname, `../public/img/${postID}`), function(err){
@@ -72,8 +72,8 @@ const createPost = (req, res) => {
     });
 
     // TESTING VARS
-    userID = 2005151994;
-    coords = [55.909095, -3.319584];
+    // userID = 2005151994;
+    // coords = [55.909095, -3.319584];
 
     postDAO.insertPost(postID, userID, req.fields.title, req.fields.description, coords[0], coords[1], function(err, result){
 
