@@ -7,18 +7,71 @@
 
 <style type="text/css">
 
-button::after {
+button#start-stop::after {
 	content: "Start Server";
 }
-button.running::after {
+button#start-stop.running::after {
 	content: "Stop Server";
 }
 
 </style>
 
+<script type="text/javascript">
+
+const updateInterval = 2000; // ms
+
+var running;
+
+const req = (url, callback) => {
+	fetch(url).then((res)=>res.json()).then((data)=>{callback(data)});
+};
+
+function updateServerStatus() {
+	req("/admin/api/serverrunning", (data) => {
+		running = data.running;
+
+		let statusElem = document.getElementById('status');
+		statusElem.innerText = "Server " + (running ? "running" : "not running");
+
+		let startStopButton = document.getElementById('start-stop');
+		if (running)
+			startStopButton.classList.add('running');
+		else
+			startStopButton.classList.remove('running');
+	});
+}
+
+function startStopServer() {
+	req(running ? "/admin/api/serverstop" : "/admin/api/serverstart", (data) => {
+		updateServerStatus();
+		if (data && data.msg) console.log(data.msg);
+	});
+}
+
+function restartServer() {
+	req("/admin/api/serverrestart", (data) => {
+		console.log(data);
+	});	
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+	// Initial update
+	updateServerStatus();
+
+	// Regularly update the page
+	setInterval(updateServerStatus, updateInterval);
+});
+
+</script>
+
 </head>
 <body>
-<p>WIP</p>
-<button></button>
+
+<p id="status"></p>
+<button id="start-stop" onclick="startStopServer()"></button>
+<button id="restart" onclick="restartServer()">Restart Server</button>
+<br>
+<button onclick="updateServerStatus()">Update Page</button>
+
 </body>
 </html>

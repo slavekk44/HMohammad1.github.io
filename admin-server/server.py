@@ -4,6 +4,7 @@ from os import getcwd
 from os.path import join
 from flask import Flask
 import subprocess
+import json
 
 app = Flask(__name__)
 
@@ -24,26 +25,26 @@ def serverstart():
 	global server_running
 
 	if server_running:
-		return "Server already running", 200, {'Content-Type': 'text/html'}
+		return json.dumps({"msg": "Server already running"}), 200, {'Content-Type': 'application/json'}
 
 	subprocess.run(["./start_server.sh"], cwd=scripts_folder)
 
 	server_running = True
 	print("Started server")
-	return "Server started", 200, {'Content-Type': 'text/html'}
+	return json.dumps({"msg": "Server started"}), 200, {'Content-Type': 'application/json'}
 
 @app.route("/api/serverstop")
 def serverstop():
 	global server_running
 
 	if not server_running:
-		return "Server not running", 200, {'Content-Type': 'text/html'}
+		return json.dumps({"msg": "Server not running"}), 200, {'Content-Type': 'application/json'}
 
 	subprocess.run(["./stop_server.sh"], cwd=scripts_folder)
 
 	server_running = False
 	print("Stopped server")
-	return "Server stopped", 200, {'Content-Type': 'text/html'}
+	return json.dumps({"msg": "Server stopped"}), 200, {'Content-Type': 'application/json'}
 
 @app.route("/api/serverrunning")
 def serverrunning():
@@ -54,10 +55,7 @@ def serverrunning():
 	# Return code 0 means grep did not fail, therefor the screen exists and the server is running
 	server_running = res.returncode == 0
 
-	if server_running:
-		return "1", 200, {'Content-Type': 'text/plain'}
-	else:
-		return "0", 200, {'Content-Type': 'text/plain'}
+	return json.dumps({"running": server_running}), 200, {'Content-Type': 'application/json'}
 
 # Start server
 if __name__ == "__main__":
