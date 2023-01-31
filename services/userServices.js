@@ -48,16 +48,16 @@ function generateUserID(){
 const createAccount = (req, res) => {
 
     // check passwords match
-    if (req.body.pw1 != req.body.pw2){
+    if (req.fields.pw1 != req.fields.pw2){
         console.log(`Password mismatch`);
         res.render("signup", {passwordError: true, message: "Passwords do not match"});
     }
 
     try{
         // check if email already exists in DB
-        userDAO.emailExists(req.body.email, function(err, result){
+        userDAO.emailExists(req.fields.email, function(err, result){
             if(result){
-                console.log(`Email: ${req.body.email} is already in use`);
+                console.log(`Email: ${req.fields.email} is already in use`);
                 return res.render("signup", {emailError: true, message: "This email is already linked to a Scrapmap account. <a href='/login'> Log-in here! </a>"});
             }
             else if(err){
@@ -65,9 +65,9 @@ const createAccount = (req, res) => {
             }
             else{
                 // check if username is already taken
-                userDAO.usernameExists(req.body.username, function(err, result){
+                userDAO.usernameExists(req.fields.username, function(err, result){
                     if(result){
-                        console.log(`Username: ${req.body.username} is already in use`);
+                        console.log(`Username: ${req.fields.username} is already in use`);
                         return res.render("signup", {usernameError: true, message: "This username is already taken."});
                     }
                     else if(err){
@@ -76,7 +76,7 @@ const createAccount = (req, res) => {
                     else{
 
                         // hash password -- callback prevents async errors
-                        hashPassword(req.body.pw1, function(err, hash){
+                        hashPassword(req.fields.pw1, function(err, hash){
 
                             if(!err){
                                 // generate a random userID
@@ -87,12 +87,12 @@ const createAccount = (req, res) => {
                                 } while(userDAO.userIDexists(userID));
                                 
                                 // inputs validated so start inserts
-                                userDAO.insertLogin(userID, req.body.username, req.body.email, hash, function(err, result){
+                                userDAO.insertLogin(userID, req.fields.username, req.fields.email, hash, function(err, result){
                                     if(!result){
                                         throw err;
                                     }
                                     else{
-                                        userDAO.insertProfile(userID, req.body.disp_name, req.body.fname, req.body.lname, function(err, result){
+                                        userDAO.insertProfile(userID, req.fields.disp_name, req.fields.fname, req.fields.lname, function(err, result){
                                             if(!result){
                                                 throw err;
                                             }
@@ -203,11 +203,11 @@ const fetchHash = (res, ID, callback) => {
 const login = (req, res) => {
 
     // check if identifier is a username or an email
-    ID = req.body.ID;
+    ID = req.fields.ID;
     fetchHash(res, ID, function(result){
 
         // hash entered pw and compare to the one from the DB
-        bcrypt.compare(req.body.pw, result.hash, function(err, match){
+        bcrypt.compare(req.fields.pw, result.hash, function(err, match){
             if(err){
                 return res.render("index", {serverError: true, message: "Oops something went wrong. Please try again later..."});
             }
@@ -279,8 +279,8 @@ const updateFriendRequest = (req, res) =>{
             return res.send("You must be logged in to update a friend request");
         }
     
-        var reqID = req.body.reqID;
-        var status = req.body.status;
+        var reqID = req.fields.reqID;
+        var status = req.fields.status;
         
         userDAO.updateFriendRequest(reqID, status, function(result){
     

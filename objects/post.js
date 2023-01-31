@@ -1,6 +1,6 @@
 class Post{
 
-    constructor(postID, coords, media, desc, date, profile){
+    constructor(postID, coords, media, title, desc, date, profile){
 
         // set the ID of the post
         this.postID = postID;
@@ -8,6 +8,8 @@ class Post{
         this.coords = coords;
         // set media to contain an image array
         this.media = media;
+        // set title
+        this.title = title;
         // post description
         this.desc = desc;
         // date post was made

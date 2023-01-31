@@ -3,24 +3,18 @@ const readline = require("readline").createInterface({
   output: process.stdout
 });
 const express = require("express");
-var bodyParser = require("body-parser");
-const session = require("express-session");
+var formidable = require("express-formidable");
+var session = require("express-session");
 //creating app
 const app = express();
 
 const {config} = require('dotenv');
 
-
-
-
 // get environment
 config({path: `.env.${process.env.NODE_ENV}`});
 
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
-
-// parse application/json
-app.use(bodyParser.json());
+// for parsing form data
+app.use(formidable());
 
 // setup session to track user details
 app.use(

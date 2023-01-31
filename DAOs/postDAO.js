@@ -4,7 +4,7 @@ const DB = require("./queryHandler");
 // inserts a post with the given postID
 function insertPost(postID, userID, title, desc, lat, long, callback){
 
-    let query = "INSERT INTO posts (postID, userID, title, descr, lat, long) VALUES (?,?,?,?,?,?)"
+    let query = "INSERT INTO posts (postID, posted_by, title, descr, latitude, longitude) VALUES (?,?,?,?,?,?)";
     let params = [postID, userID, title, desc, lat, long];
     DB.executeQuery(query, params, function(err, rows){
         if(err){
@@ -18,13 +18,13 @@ function insertPost(postID, userID, title, desc, lat, long, callback){
 
 
 // add media to an existing post -- media is an array containing links to the media that has been uploaded to the server
-function insertPostMedia(postID, media, callback){
+function insertPostMedia(postID, links, callback){
 
     let query = "INSERT INTO post_media (postID, link, pos) VALUES (?,?,?)";
 
     // init counter
     var pos = 1;
-    media.forEach(link => {
+    links.forEach(link => {
         
         // populate params array with new variables
         params = [postID, link, pos];
@@ -94,6 +94,8 @@ function getPostByID(postID, callback){
     let query = `
         SELECT  postID AS postID,
                 posted_by as userID,
+                title as title,
+                descr as descr,
                 posted as posted,
                 latitude as 'lat',
                 longitude as 'long'

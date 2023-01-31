@@ -13,25 +13,28 @@ const { res } = require('express');
 
 // import upload library
 const formidable = require('formidable');
-const { mkdir } = require('fs');
+const fs = require('fs');
 const path = require('path');
 const { array } = require('yargs');
 
 // moves an image/video into a public folder that corresponds to its postID
-function uploadMedia(postID, data, links){
+function uploadMedia(postID, data, callback){
 
-    var rawIMG = fs.readFileSync(data.filepath);
-    var filename = data.name;
-    var newPath = `/public/img/${postID}/${filename}`
+    // init array for holding uploaded paths
+    links = [];
+
+    var rawIMG = fs.readFileSync(data.path);
+    var filename = encodeURIComponent(data.name.replace(/\s/g, "-"));
+    var newPath = path.join(__dirname, `../public/img/${postID}/${filename}`);
 
     fs.writeFile(newPath, rawIMG, function(err){
-
         if(err){
-            throw err;
+            return callback(err, null);
         }
         else{
             // insert new image link to link array
-            links.push(newPath);
+            links.push(`/public/img/${postID}/${filename}`);
+            return callback(null, links);
         }
 
     });
@@ -48,58 +51,62 @@ const createPost = (req, res) => {
 
     } while(postDAO.postIDexists(postID));
 
-    // get current location of user
-    if(req.session != null && req.session.user){
-        var user = req.session.user;
-        coords = [55.909095, -3.319584]
-        //coords = user.getCoords();
-        userID = user.userID;
-    }
-    else{
-        res.send("You must be logged in to create a post");
-    }
+    // // get current location of user
+    // if(req.session != null && req.session.user){
+    //     var user = req.session.user;
+    //     coords = [55.909095, -3.319584];
+    //     //coords = user.getCoords();
+    //     userID = user.userID;
+    // }
+    // else{
+    //     res.send("You must be logged in to create a post");
+    // }
 
-    // parse form data 
-    const form = new formidable.IncomingForm();
-    form.parse(req, function(err, fields, files){
+    // make directory for new post
+    fs.mkdir(path.join(__dirname, `../public/img/${postID}`), function(err){
 
-        // make directory for new post
-        mkdir(`/public/img/${postID}`);
+        if(err){
+            throw err;
+        }
 
-        postDAO.insertPost(postID, userID, fields.title, fields.description, coords[0], coords[1], function(){
+    });
 
-            // init array for holding uploaded paths
-            links = array();
+    // TESTING VARS
+    userID = 2005151994;
+    coords = [55.909095, -3.319584];
 
-            // try and upload each file
-            files.forEach(media =>{
-                
-                try{
-                    uploadMedia(postID, media, links);
-                }
-                catch (err){
-                    throw err;
-                }
-            });
+    postDAO.insertPost(postID, userID, req.fields.title, req.fields.description, coords[0], coords[1], function(err, result){
 
+        if(err){
+            throw err;
+        }
 
-            // if all files uploaded okay then insert links to DB
-            postDAO.insertPostMedia(postID, links, function(err, result){
+        if(!req.files.myfile.length){
+
+            uploadMedia(postID, req.files.myfile, function(err, links){
 
                 if(err){
                     throw err;
                 }
-                else{
 
-                    // fetch newly created post and display
-                    getPostByID(postID, function(post){
-                    return res.send(JSON.stringify(post));
-                    });
-                }
+                // if all files uploaded okay then insert links to DB
+                postDAO.insertPostMedia(postID, links, function(err, result){
 
+                    if(err){
+                        throw err;
+                    }
+                    else{
+
+                        // get request to fetch post
+                        res.redirect(`/API/post/${postID}`);
+                    }
+
+                });
             });
-
-        });
+        }
+        else{
+            res.send("Multiple file uploads are not currently supported");
+        }
 
     });
 
@@ -165,7 +172,7 @@ const getPostByID = (req, res) => {
                     getPostMedia(postID, function(links){;
 
                         // create post w/ profile & media links
-                        var post = new Post(postID, [postData.lat, postData.long], links, postData.descr, postData.posted, profile);
+                        var post = new Post(postID, [postData.lat, postData.long], links, postData.title, postData.descr, postData.posted, profile);
 
                         res.send(JSON.stringify(post));
                     });
@@ -188,9 +195,9 @@ const getPostByID = (req, res) => {
 const addComment = (req, res) =>{
 
     // get vars from POST
-    var userID = req.body.userID;
-    var postID = req.body.postID;
-    var comment = req.body.comment;
+    var userID = req.fields.userID;
+    var postID = req.fields.postID;
+    var comment = req.fields.comment;
 
     postDAO.addComment(postID, userID, comment, function(result){
 
