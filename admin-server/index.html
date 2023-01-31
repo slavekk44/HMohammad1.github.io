@@ -84,6 +84,9 @@ button#start-stop.running::after {
 
 const updateInterval = 2000; // ms
 
+const statusLoadingText = "Server status loading &#10227;";
+const gitLoadingText = "Git output loading &#10227;";
+
 var running;
 
 var statusElem;
@@ -107,7 +110,7 @@ function updateServerStatus() {
 }
 
 function startStopServer() {
-	statusElem.innerHTML = "Server status loading &#10227;";
+	statusElem.innerHTML = statusLoadingText;
 
 	req(running ? "/admin/api/serverstop" : "/admin/api/serverstart", (data) => {
 		updateServerStatus();
@@ -116,7 +119,7 @@ function startStopServer() {
 }
 
 function restartServer() {
-	statusElem.innerHTML = "Server status loading &#10227;";
+	statusElem.innerHTML = statusLoadingText;
 
 	req("/admin/api/serverrestart", (data) => {
 		console.log(data);
@@ -124,12 +127,16 @@ function restartServer() {
 }
 
 function gitPull() {
+	prt(gitLoadingText);
+
 	req("/admin/api/gitpull", (data) => {
 		prt(data.msg);
 	});
 }
 
 function gitStatus() {
+	prt(gitLoadingText);
+
 	req("/admin/api/gitstatus", (data) => {
 		prt(data.msg);
 	});
@@ -167,8 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	<button id="start-stop" onclick="startStopServer()"></button>
 	<button id="restart" onclick="restartServer()">Restart Server</button>
 </center>
-<!-- <br>
-<button onclick="updateServerStatus()">Update Page</button> -->
 
 <hr>
 
