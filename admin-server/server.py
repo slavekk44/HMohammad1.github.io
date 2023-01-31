@@ -13,6 +13,7 @@ pagef = open('index.html', 'r')
 page = pagef.read()
 pagef.close()
 
+main_folder = join(getcwd(), "../")
 scripts_folder = join(getcwd(), "scripts/")
 
 server_running = False
@@ -79,6 +80,15 @@ def serverrunning():
 	isServerRunning()
 
 	return json.dumps({"running": server_running}), 200, {'Content-Type': 'application/json'}
+
+@app.route("/api/gitpull")
+def gitpull():
+	res = subprocess.run(["git", "pull"], capture_output=True)
+
+	print("Git pull:")
+	print(res)
+
+	return json.dumps({"msg": res}), 200, {'Content-Type': 'application/json'}
 
 # Start server
 if __name__ == "__main__":
