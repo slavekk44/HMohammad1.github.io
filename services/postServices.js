@@ -143,6 +143,57 @@ function getPostMedia(postID, callback){
 
 }
 
+
+// returns an array with all of a users posts
+const getUserPosts = (req, res) =>{
+
+    // userID from GET request
+    var userID = req.params.userID;
+
+    postDAO.getAllUserPostIDs(userID, function(rows){
+
+        if(!rows){
+            res.send(404);
+        }
+        else{
+
+            // init post array
+            posts = [];
+            
+            // counter for posts to fetch
+            var postsToFetch = rows.length;
+
+            rows.forEach(row =>{
+
+                // get post object and add to array
+                fetchPostByID(row.postID, function(post){
+
+                    // error check
+                    if(post){
+
+                        posts.push(post);
+                        if(posts.length === postsToFetch){
+                            // once all IDs processed return the array
+                            res.send(JSON.stringify(posts));
+                        }
+
+                    }
+                    else{
+                        // allows to fail gracefully if a post cannot be retrieved for some reason
+                        postsToFetch--;
+                    }
+
+                });
+            });
+
+
+        }
+
+    });
+
+}
+
+
 // returns a post object complete with poster profile
 const getPostByID = (req, res) => {
 
@@ -187,6 +238,51 @@ const getPostByID = (req, res) => {
     }
     catch(err){
         return res.send(err);
+    }
+
+}
+
+// returns a post object complete with poster profile
+function fetchPostByID(postID, callback){
+
+    try{
+
+        postDAO.getPostByID(postID, function(err, postData){
+            // error check
+            if(!err){
+
+                // post doesn't exist -- 404
+                if(postData === undefined){
+                    return res.send("404");
+                }
+
+                console.log(postData);
+
+                // assign userID
+                userID = postData.userID;
+
+                // get profile
+                userServices.getProfileByID(userID, function(profile){
+
+                    // fetch media links
+                    getPostMedia(postID, function(links){;
+
+                        // create post w/ profile & media links
+                        var post = new Post(postID, [postData.lat, postData.long], links, postData.title, postData.descr, postData.posted, profile);
+
+                        return callback(post);
+                    });
+                });
+
+            }
+            else{
+                console.log(err);
+                throw err;
+            }
+        });
+    }
+    catch(err){
+        callback(false);
     }
 
 }
@@ -250,6 +346,7 @@ const getPostComments = (req, res) =>{
 module.exports = {
 
     getPostByID,
+    getUserPosts,
     createPost,
     addComment,
     getPostComments

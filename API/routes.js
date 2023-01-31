@@ -18,6 +18,9 @@ router.get("/API/logout", userServices.logout);
 router.get("/API/post/:ID", postServices.getPostByID);
 router.post("/API/upload", postServices.createPost);
 
+// get all posts by a user
+router.get("/API/posts/:userID", postServices.getUserPosts);
+
 router.get("/API/sendRequest/:sendTo", userServices.sendFriendRequest);
 router.post("/API/updateRequest", userServices.updateFriendRequest);
 router.get("/API/getFriends", userServices.getFriendProfiles);

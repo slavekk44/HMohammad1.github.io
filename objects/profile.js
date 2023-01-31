@@ -10,8 +10,6 @@ class Profile{
         this.colour = colour;
     }
 
-
-
 }
 
 module.exports = Profile;
