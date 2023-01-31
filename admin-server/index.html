@@ -7,6 +7,36 @@
 
 <style type="text/css">
 
+* {
+	padding: 0;
+	margin: 0;
+}
+
+body {
+	font-family: monospace;
+}
+
+div.content-container {
+	max-width: 800px;
+
+	margin: 20px auto 0 auto;
+}
+
+p, pre {
+	margin: 0.5em;
+}
+
+button {
+	font: inherit;
+
+	padding: 0.25em 0.4em;
+	margin: 0 0.5em;
+
+	border: 2px solid #0007;
+
+	background-color: #0001;
+}
+
 button#start-stop::after {
 	content: "Start Server";
 }
@@ -54,6 +84,24 @@ function restartServer() {
 	});	
 }
 
+function gitPull() {
+	req("/admin/api/gitpull", (data) => {
+		prt(data.msg);
+	});
+}
+
+function gitStatus() {
+	req("/admin/api/gitpull", (data) => {
+		prt(data.msg);
+	});
+}
+
+function prt(msg) {
+	let elem = document.getElementById('git-status');
+
+	elem.innerText = msg;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 	// Initial update
 	updateServerStatus();
@@ -67,11 +115,21 @@ document.addEventListener('DOMContentLoaded', () => {
 </head>
 <body>
 
-<p id="status"></p>
+<div class="content-container">
+<p id="status">(Server status)</p>
 <button id="start-stop" onclick="startStopServer()"></button>
 <button id="restart" onclick="restartServer()">Restart Server</button>
-<br>
-<button onclick="updateServerStatus()">Update Page</button>
+<!-- <br>
+<button onclick="updateServerStatus()">Update Page</button> -->
+
+<hr>
+
+<button id="git-pull" onclick="gitPull()">Git Pull</button>
+<button id="git-status" onclick="gitStatus()">Git Status</button>
+
+<pre id="git-status">(Git status)</pre>
+
+</div>
 
 </body>
 </html>

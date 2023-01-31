@@ -90,6 +90,15 @@ def gitpull():
 
 	return json.dumps({"msg": res}), 200, {'Content-Type': 'application/json'}
 
+@app.route("/api/gitstatus")
+def gitstatus():
+	res = subprocess.run(["git", "status"], capture_output=True)
+
+	print("Git status:")
+	print(res)
+
+	return json.dumps({"msg": rses}), 200, {'Content-Type': 'application/json'}
+
 # Start server
 if __name__ == "__main__":
 	app.run(host="0.0.0.0", port=3100, debug=False)
