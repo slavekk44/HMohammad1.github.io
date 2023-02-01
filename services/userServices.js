@@ -80,11 +80,18 @@ const createAccount = (req, res) => {
 
                             if(!err){
                                 // generate a random userID
-                                var userID; 
+                                var userID;
+                                var count = 1;
                                 do{
                                     userID = Math.floor(Math.random() * 2147483646);
+                                    userDAO.userIDexists(userID, function(err, rows){
+                                        if(err){
+                                            throw err;
+                                        }
+                                        count = rows.count;
+                                    })
                 
-                                } while(userDAO.userIDexists(userID));
+                                } while(count != 1);
                                 
                                 // inputs validated so start inserts
                                 userDAO.insertLogin(userID, req.fields.username, req.fields.email, hash, function(err, result){
@@ -137,8 +144,11 @@ function getUserByID(userID, callback){
 
     try{
         // fetch row from DB
-        userDAO.getUserByID(userID, function(data){
-            
+        userDAO.getUserByID(userID, function(err, data){
+            if(err){
+                throw err;
+            }
+
             // create profile
             var profile = new Profile(data.username, data.display, data.fname, data.lname, data.pfp, data.colour);
             // create user object
@@ -175,7 +185,7 @@ function getProfileByID(userID, callback){
 
 const fetchHash = (res, ID, callback) => {
     if(ID.includes("@")){
-        userDAO.fetchPaswordByEmail(ID, function(result){
+        userDAO.fetchPaswordByEmail(ID, function(err, result){
             if(!result){
                 console.log("email doesn't exist");
                 return res.render("index", {IDerror: true, message: "There is no Scrapmap account linked to this email."})
@@ -186,7 +196,7 @@ const fetchHash = (res, ID, callback) => {
         });
     }
     else{
-        userDAO.fetchPaswordByUsername(ID, function(result){
+        userDAO.fetchPaswordByUsername(ID, function(err, result){
             if(!result){
                 console.log("UN doesn't exist");
                 return res.render("index", {IDerror: true, message: "There is no Scrapmap account with this username."})

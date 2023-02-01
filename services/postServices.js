@@ -33,7 +33,7 @@ function uploadMedia(postID, data, callback){
         }
         else{
             // insert new image link to link array
-            links.push(`/public/img/${postID}/${filename}`);
+            links.push(`/img/${postID}/${filename}`);
             return callback(null, links);
         }
 

@@ -80,7 +80,7 @@ function startServer(){
 // kills currently running server
 function killServer(){
   server.close(() =>{
-    console.log(`Scrapmap no longer listening @ http://${host}:${port}/`);
+    //console.log(`Scrapmap no longer listening @ http://${host}:${port}/`);
   });
 }
 

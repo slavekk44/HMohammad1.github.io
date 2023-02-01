@@ -26,7 +26,7 @@ function insertLogin(userID, username, email, hash, callback){
 
     DB.executeQuery(query, params, function(err, rows){
         if(err){
-            return callback(err, false)
+            return callback(err, null)
         }
         else{
             return callback(null, true);
@@ -107,7 +107,7 @@ function usernameExists(username, callback){
 
 }
 
-function userIDexists(userID){
+function userIDexists(userID, callback){
 
     let query = "SELECT count(userID) AS count FROM user_logins WHERE userID = ?";
     let params = [userID];
@@ -115,15 +115,10 @@ function userIDexists(userID){
     DB.executeQuery(query, params, function(err, rows, fields){
 
         if(!err){
-            if(rows[0].count == 0){
-                return false;
-            }
-            else{
-                return true;
-            }
+            return callback(null, rows[0]);
         }
         else{
-            throw(err);
+            return callback(err, null);
         }
     });
 
@@ -140,14 +135,14 @@ function fetchPaswordByEmail(email, callback){
         if(!err){
             // if empty set returned email doesn't exist
             if(rows.length == 0){
-                return callback(false)
+                return callback(null, false)
             }
             else{
-                return callback(rows[0]);
+                return callback(null, rows[0]);
             }
         }
         else{
-            throw err;
+            return callback(err, null);
         }
     });
 
@@ -162,14 +157,14 @@ function fetchPaswordByUsername(username, callback){
         if(!err){
             // if empty set returned username doesn't exist
             if(rows.length == 0){
-                callback(false);
+                return callback(null, false);
             }
             else{
-                callback(rows[0]);
+                return callback(null, rows[0]);
             }
         }
         else{
-            throw err;
+            return callback(err, null);
         }
     });
 
@@ -196,11 +191,15 @@ function getUserByID(userID, callback){
     DB.executeQuery(query, params, function(err, rows, fields){
 
         if(!err){
-            return callback(rows[0]);
+            if(rows.length == 0){
+                return callback(null, false);
+            }
+            else{
+                return callback(null, rows[0]);
+            }
         }
         else{
-
-            throw err;
+            return callback(err, null);
         }
     });
 }
@@ -225,11 +224,16 @@ function getProfileByID(userID, callback){
     DB.executeQuery(query, params, function(err, rows, fields){
         
         if(!err){
-            return callback(rows[0]);
+            if(rows.length == 0){
+                return callback(null, false);
+            }
+            else{
+                return callback(null, rows[0]);
+            }
         }
         else{
 
-            throw err;
+            return callback(err, null);
         }
     });
 }

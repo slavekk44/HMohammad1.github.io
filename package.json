@@ -46,8 +46,11 @@
       "/node_modules"
     ],
     "verbose": true,
+    "testTimeout": 1500,
+    "globalSetup": "./__tests__/preTest.js",
+    "globalTeardown": "./__tests__/postTest.js",
     "testMatch": [
-      "**/__tests__/*.js?(x)"
+      "**/__tests__/*.test.js?(x)"
     ]
   }
 }
