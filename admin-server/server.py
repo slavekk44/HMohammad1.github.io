@@ -9,16 +9,17 @@ import time
 
 app = Flask(__name__)
 
-pagef = open('index.html', 'r')
-page = pagef.read()
-pagef.close()
-
+main_folder = join(getcwd(), "../")
 scripts_folder = join(getcwd(), "scripts/")
 
 server_running = False
 
 @app.route("/")
 def index_page():
+	pagef = open('index.html', 'r')
+	page = pagef.read()
+	pagef.close()
+
 	return page, 200, {'Content-Type': 'text/html'}
 
 @app.route("/api/serverstart")
@@ -79,6 +80,28 @@ def serverrunning():
 	isServerRunning()
 
 	return json.dumps({"running": server_running}), 200, {'Content-Type': 'application/json'}
+
+@app.route("/api/gitpull")
+def gitpull():
+	res = subprocess.run(["git", "pull"], capture_output=True)
+
+	msg = res.stdout.decode('utf-8').replace('\n', '<br>')
+
+	print("Git pull:")
+	print(msg)
+
+	return json.dumps({"msg": msg}), 200, {'Content-Type': 'application/json'}
+
+@app.route("/api/gitstatus")
+def gitstatus():
+	res = subprocess.run(["git", "status"], capture_output=True)
+
+	msg = res.stdout.decode('utf-8').replace('\n', '<br>')
+
+	print("Git status:")
+	print(msg)
+
+	return json.dumps({"msg": msg}), 200, {'Content-Type': 'application/json'}
 
 # Start server
 if __name__ == "__main__":
