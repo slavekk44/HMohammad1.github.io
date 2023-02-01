@@ -26,6 +26,8 @@ h3 {
 
 h1, h3 {
 	text-align: center;
+
+	text-shadow: 0 0.03em 0 #0006, 0 0.06em 0 #0003;
 }
 
 div.content-container {
@@ -83,6 +85,9 @@ button#start-stop.running::after {
 <script type="text/javascript">
 
 const updateInterval = 2000; // ms
+
+var updateControl;
+var updateInput;
 
 const statusLoadingText = "Server status loading &#10227;";
 const gitLoadingText = "Git output loading &#10227;";
@@ -148,14 +153,27 @@ function prt(msg) {
 	elem.innerHTML = msg;
 }
 
+function toggleUpdate() {
+	if (updateInput.checked) {
+		updateControl = setInterval(updateServerStatus, updateInterval);
+		console.log("Started updates");
+	} else {
+		clearInterval(updateControl);
+		console.log("Stopped updates");
+	}
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 	statusElem = document.getElementById('status');
 
 	// Initial update
 	updateServerStatus();
 
-	// Regularly update the page
-	setInterval(updateServerStatus, updateInterval);
+	// Set up controls
+	updateInput = document.getElementById('update');
+
+	// Start continuous updates if enabled
+	toggleUpdate();
 });
 
 </script>
@@ -173,6 +191,8 @@ document.addEventListener('DOMContentLoaded', () => {
 <center>
 	<button id="start-stop" onclick="startStopServer()"></button>
 	<button id="restart" onclick="restartServer()">Restart Server</button>
+	<input type="checkbox" name="update" id="update" onchange="toggleUpdate()" checked>
+	<label for="update">Continuously update status</label>
 </center>
 
 <hr>
