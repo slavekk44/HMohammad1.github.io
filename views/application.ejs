@@ -15,12 +15,11 @@
     <div class="profile">
         <div id="data">
             <ul>
-                <li><a class="active" onclick="onProfile()">My Profile</a></li>
+                <li><a class="active" onclick="onProfile()">My Profile: Welcome <%= user.profile.display%></a></li>
                 <li><a href="#news">Friends</a></li>
                 <li><a href="#contact">Add Friend</a></li>
                 <li><a href="#about">Friend Requests</a></li>
                 <li><a href="#about">Settings</a></li>
-                <li><a href="#about"><%= user.profile.display%></a></li>
             </ul>
         </div>
 
