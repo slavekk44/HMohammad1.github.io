@@ -2,7 +2,7 @@
 
 from os import getcwd
 from os.path import join
-from flask import Flask
+from flask import Flask, request
 import subprocess
 import json
 import time
@@ -102,6 +102,21 @@ def gitstatus():
 	print(msg)
 
 	return json.dumps({"msg": msg}), 200, {'Content-Type': 'application/json'}
+
+@app.route("/api/dbexecute")
+def dbexecute():
+	sql = request.args.get('sql')
+
+	print("DB Execute:")
+	print(sql)
+
+	res = subprocess.run(["mysql -uscrapmap -pasdf -I'll do this later"], shell=True, capture_output=True)
+
+	print("mysql output:")
+	print(res.stdout.strip())
+
+	return json.dumps({"res": res.stdout.decode('utf-8')}), 200, {'Content-Type': 'application/json'}
+
 
 # Start server
 if __name__ == "__main__":

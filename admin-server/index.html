@@ -7,13 +7,23 @@
 
 <style type="text/css">
 
+:root {
+	--main-border: 2px solid #0007;
+}
+
 * {
 	padding: 0.5em 0;
 	margin: 0;
+
+	box-sizing: border-box;
 }
 
 body {
 	font-family: monospace;
+}
+
+div {
+	padding: 0;
 }
 
 h1 {
@@ -48,11 +58,12 @@ p#status {
 	text-align: center;
 }
 
-pre#git-output {
+pre {
 	margin-top: 1.5em;
+	margin-bottom: 1.5em;
 	padding: 1em 2em;
 
-	border: 2px solid #0007;
+	border: var(--main-border);
 
 	background-color: #0001;
 }
@@ -63,7 +74,7 @@ button {
 	padding: 0.25em 0.4em;
 	margin: 0 0.5em;
 
-	border: 2px solid #0007;
+	border: var(--main-border);
 
 	background-color: #0001;
 
@@ -79,6 +90,64 @@ button#start-stop::after {
 button#start-stop.running::after {
 	content: "Stop Server";
 }
+textarea#sql-input {
+	display: block;
+	width: 100%;
+	padding: 1em 2em;
+
+	border: var(--main-border);
+	background-color: #0001;
+	
+	resize: vertical;
+
+	min-height: fit-content;
+}
+textarea:focus-visible {
+	border: var(--main-border);
+}
+
+div.collapsible {
+	transition: height 02s ease-out;
+
+}
+div.collapsible.collapsed {
+	height: 0;
+	overflow: hidden;
+}
+h3.collapsible {
+	cursor: pointer;
+}
+/* h3.collapsible:hover {
+	text-decoration: underline;
+}
+h3.collapsible:hover::after {
+	text-decoration: none !important;
+} */
+h3.collapsible::after {
+	content: "\2B9F";
+
+	margin-left: 0.2em;
+}
+h3.collapsed::after {
+	content: "\2B9E";
+
+	margin-left: 0.2em;
+}
+
+.loading::after {
+	content: "";
+
+	animation: loading 1.2s infinite step-end;
+}
+
+@keyframes loading {
+	0% {content: ".";}
+	/* 33.9% {content: ".";} */
+	33% {content: "..";}
+	/* 66.9% {content: "..";} */
+	67% {content: "...";}
+	100% {content: "...";}
+}
 
 </style>
 
@@ -90,7 +159,8 @@ var updateControl;
 var updateInput;
 
 const statusLoadingText = "Server status loading &#10227;";
-const gitLoadingText = "Git output loading &#10227;";
+// const gitLoadingText = "Git output loading &#10227;";
+const gitLoadingText = "<span class=\"loading\">Git output loading</span";
 
 var running;
 
@@ -163,6 +233,23 @@ function toggleUpdate() {
 	}
 }
 
+function toggle(elemId) {
+	let elem = document.getElementById(elemId);
+	let elemHeader = document.getElementById(elemId + '-header');
+
+	if (elem.classList.contains('collapsed'))
+		elem.classList.remove('collapsed');
+	else
+		elem.classList.add('collapsed');
+
+
+	if (elem.classList.contains('collapsed')) {
+		elemHeader.classList.add('collapsed');
+	} else {
+		elemHeader.classList.remove('collapsed');
+	}
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 	statusElem = document.getElementById('status');
 
@@ -188,22 +275,38 @@ document.addEventListener('DOMContentLoaded', () => {
 <p id="status">Server status loading &#10227;</p>
 
 <h3>Server Controls</h3>
-<center>
-	<button id="start-stop" onclick="startStopServer()"></button>
-	<button id="restart" onclick="restartServer()">Restart Server</button>
-	<input type="checkbox" name="update" id="update" onchange="toggleUpdate()" checked>
-	<label for="update">Continuously update status</label>
-</center>
+<div id="server-controls">
+	<center>
+		<button id="start-stop" onclick="startStopServer()"></button>
+		<button id="restart" onclick="restartServer()">Restart Server</button>
+		<input type="checkbox" name="update" id="update" onchange="toggleUpdate()" checked>
+		<label for="update">Continuously update status</label>
+	</center>
+</div>
 
 <hr>
 
-<h3>Git Controls</h3>
-<center>
-	<button id="git-pull" onclick="gitPull()">Git Pull</button>
-	<button id=="git-status" onclick="gitStatus()">Git Status</button>
-</center>
+<h3 class="collapsible" id="git-controls-header" onclick="toggle('git-controls')">Git Controls</h3>
+<div class="collapsible" id="git-controls">
+	<center>
+		<button id="git-pull" onclick="gitPull()">Git Pull</button>
+		<button id="git-status" onclick="gitStatus()">Git Status</button>
+	</center>
 
-<pre id="git-output">(Command output)</pre>
+	<pre id="git-output">(Command output)</pre>
+</div>
+
+<hr>
+
+<h3 class="collapsible collapsed" id="sql-controls-header" onclick="toggle('sql-controls')">Database Controls</h3>
+<div class="collapsible collapsed" id="sql-controls">
+	<textarea disabled id="sql-input" style="margin-bottom: 1.5em;" placeholder="SQL code here"></textarea>
+	<center>
+		<button disabled id="sql-exec">Run SQL</button>
+	</center>
+
+	<pre id="sql-output">(Command output)</pre>
+</div>
 
 </div>
 
