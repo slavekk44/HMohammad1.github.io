@@ -4,7 +4,7 @@ function initMap() {
     
     var map = new google.maps.Map(document.getElementById("map"), {
         zoom: 15,
-        center: location
+        center: location,
         mapId: '4a11e687fb2c35f2'
     });
 
