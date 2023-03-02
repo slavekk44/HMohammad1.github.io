@@ -85,7 +85,7 @@ function initMap(location) {
             marker = new google.maps.Marker({
                 position: property.location,
                 map: map,
-                icon: '../images/map_markers/marker-dgrey.png'
+                icon: '../Images/map_markers/marker-dgrey.png'
             });
 
             // else marker is blue if within 50m
@@ -93,7 +93,7 @@ function initMap(location) {
             marker = new google.maps.Marker({
                 position: property.location,
                 map: map,
-                icon: '../images/map_markers/marker-blue.png'
+                icon: '../Images/map_markers/marker-blue.png'
             });
         }
 
