@@ -110,12 +110,13 @@ def dbexecute():
 	print("DB Execute:")
 	print(sql)
 
-	res = subprocess.run(["mysql -uscrapmap -pasdf -I'll do this later"], shell=True, capture_output=True)
+	res = subprocess.run(["mysql -uscrapmap -pasdf -e \"" + sql + "\"], shell=True, capture_output=True)
+	# res = subprocess.run(["ls /"], shell=True, capture_output=True)
 
 	print("mysql output:")
 	print(res.stdout.strip())
 
-	return json.dumps({"res": res.stdout.decode('utf-8')}), 200, {'Content-Type': 'application/json'}
+	return json.dumps({"msg": res.stdout.decode('utf-8').replace('\n', '<br>')}), 200, {'Content-Type': 'application/json'}
 
 
 # Start server

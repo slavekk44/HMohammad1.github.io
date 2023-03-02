@@ -136,17 +136,13 @@ h3.collapsed::after {
 
 .loading::after {
 	content: "";
-
-	animation: loading 1.2s infinite step-end;
+	animation: loading 1.5s infinite step-end;
 }
 
 @keyframes loading {
 	0% {content: ".";}
-	/* 33.9% {content: ".";} */
 	33% {content: "..";}
-	/* 66.9% {content: "..";} */
 	67% {content: "...";}
-	100% {content: "...";}
 }
 
 </style>
@@ -160,7 +156,8 @@ var updateInput;
 
 const statusLoadingText = "Server status loading &#10227;";
 // const gitLoadingText = "Git output loading &#10227;";
-const gitLoadingText = "<span class=\"loading\">Git output loading</span";
+const gitLoadingText = "<span class=\"loading\">Git output loading</span>";
+const sqlLoadingText = "<span class=\"loading\">MySQL output loading</span>";
 
 var running;
 
@@ -221,6 +218,14 @@ function prt(msg) {
 	let elem = document.getElementById('git-output');
 
 	elem.innerHTML = msg;
+}
+
+function dbExecute() {
+	let sql = document.getElementById('sql-input').value;
+
+	req("/admin/api/dbexecute?sql=" + sql, (data) => {
+		document.getElementById('sql-output').innerHTML = data.msg;
+	});
 }
 
 function toggleUpdate() {
@@ -300,9 +305,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <h3 class="collapsible collapsed" id="sql-controls-header" onclick="toggle('sql-controls')">Database Controls</h3>
 <div class="collapsible collapsed" id="sql-controls">
-	<textarea disabled id="sql-input" style="margin-bottom: 1.5em;" placeholder="SQL code here"></textarea>
+	<textarea id="sql-input" style="margin-bottom: 1.5em;" placeholder="SQL code here"></textarea>
 	<center>
-		<button disabled id="sql-exec">Run SQL</button>
+		<button id="sql-exec" onclick="dbExecute()">Run SQL</button>
 	</center>
 
 	<pre id="sql-output">(Command output)</pre>
