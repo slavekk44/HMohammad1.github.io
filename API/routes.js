@@ -30,6 +30,10 @@ router.get("/API/getFriends", userServices.getFriendProfiles);
 router.post("/API/addComment", postServices.addComment);
 router.get("/API/postComments/:postID", postServices.getPostComments);
 
+// react functions
+router.get("/API/addReact/:postID/:reaction");
+router.get("/API/removeReact/:postID");
+
 console.log("EXPORTING ROUTER");
 //export router
 module.exports = router;

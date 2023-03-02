@@ -169,7 +169,7 @@ function getProfileByID(userID, callback){
 
     try{
         // fetch row from DB
-        userDAO.getProfileByID(userID, function(data){
+        userDAO.getProfileByID(userID, function(err, data){
             // create profile
             var profile = new Profile(data.username, data.display, data.fname, data.lname, data.pfp, data.colour);
             return callback(profile);
@@ -379,6 +379,7 @@ module.exports = {
     createAccount,
     login,
     logout,
+    getUserByID,
     getProfileByID,
     sendFriendRequest,
     updateFriendRequest,

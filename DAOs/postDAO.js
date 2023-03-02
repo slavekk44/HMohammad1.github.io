@@ -1,4 +1,5 @@
 const { query } = require("express");
+const { use } = require("../API/routes");
 const DB = require("./queryHandler");
 
 // inserts a post with the given postID
@@ -46,7 +47,7 @@ function insertPostMedia(postID, links, callback){
 
 }
 
-function postIDexists(postID){
+function postIDexists(postID, callback){
 
     let query = "SELECT count(postID) AS count FROM posts WHERE postID = ?";
     let params = [postID];
@@ -55,14 +56,14 @@ function postIDexists(postID){
 
         if(!err){
             if(rows[0].count == 0){
-                return false;
+                return callback(null, false);
             }
             else{
-                return true;
+                return callback(null, true);
             }
         }
         else{
-            throw(err);
+            return callback(err, null);
         }
     });
 
@@ -119,7 +120,7 @@ function getPostByID(postID, callback){
 
 }
 
-function addPostComment(postID, userID, comment){
+function addPostComment(postID, userID, comment, callback){
 
     let query = `INSERT INTO post_comments (postID, comment_from, text) VALUES (?,?,?)`;
     let params = [postID, userID, comment];
@@ -128,11 +129,11 @@ function addPostComment(postID, userID, comment){
 
         if(!err){
             console.log(rows);
-            return callback(true);
+            return callback(null, true);
         }
         else{
             console.log(err);
-            return callback(false);
+            return callback(err, false);
         }
 
     });
@@ -141,7 +142,7 @@ function addPostComment(postID, userID, comment){
 }
 
 // get all comments and their associated userIDs
-function getPostComments(postID){
+function getPostComments(postID, callback){
 
     let query = `SELECT text AS TEXT, comment_from as userID FROM post_comments WHERE postID = ?`
     let params = [postID];
@@ -149,11 +150,11 @@ function getPostComments(postID){
     DB.executeQuery(query, params, function(err, rows, fields){
 
         if(!err){
-            return callback(rows);
+            return callback(null, rows);
         }
         else{
             console.log(err);
-            return callback(false);
+            return callback(err, null);
         }
 
     });
@@ -170,17 +171,105 @@ function getAllUserPostIDs(userID, callback){
     DB.executeQuery(query, params, function(err, rows, fields){
 
         if(!err){
-            return callback(rows);
+            return callback(null, rows);
         }
         else{
             console.log(err);
-            return callback(false);
+            return callback(err, null);
         }
 
     });
 
 
 }
+
+// adds a reaction to a post
+function addReact(postID, userID, reactID, callback){
+
+    let query =  "INSERT INTO post_reactions (postID, react_from, reaction) VALUES(?,?,?)";
+    let params = [postID, userID, reactID];
+
+    DB.executeQuery(query, params, function(err, rows, fields){
+
+        if(!err){
+            return callback(null, true);
+        }
+        else{
+            return callback(err, false);
+        }
+
+    });
+}
+
+// updates an existing user/post react pair with a new reaction
+function updateReact(userID, postID, react, callback){
+    let query = "UPDATE post_reactions SET reaction = ? WHERE react_from = ? AND postID = ?";
+    let params = [react, userID, postID];
+}
+
+function userReactedToPost(userID, postID, callback){
+
+    let query = "SELECT count(reaction) AS reacted FROM post_reactions WHERE react_from = ? AND postID = ?";
+    let params = [userID, postID];
+
+    DB.executeQuery(query, params, function(err, rows, fields){
+
+        if(!err){
+            if(reacted > 0){
+                return callback(null, true);
+            }
+            else{
+                return callback(null, false);
+            }
+        }
+        else{
+            return callback(err, null);
+        }
+
+    });
+
+}
+
+
+function removeReact(userID, postID, callback){
+
+    let query =  "DELETE FROM post_reactions WHERE reaction_from = ? AND postID = ?";
+    let params = [userID, postID];
+
+    DB.executeQuery(query, params, function(err, rows, fields){
+
+        if(!err){
+            return callback(null, true);
+        }
+        else{
+            return callback(err, false);
+        }
+
+    });
+}
+
+
+function getPostReacts(postID, callback){
+
+    // orders in oldest to newest as results will be popped into react obj
+    let query = "SELECT reaction, react_from FROM post_reactions WHERE postID = ? ORDER BY posted ASC";
+    let params = [postID];
+
+    DB.executeQuery(query, params, function(err, rows, fields){
+
+        if(!err){
+            return callback(null, rows);
+        }
+        else{
+            return callback(err, null);
+        }
+
+    });
+
+}
+
+function removeReact(postID, )
+
 
 
 module.exports = {
@@ -192,6 +281,11 @@ module.exports = {
     insertPostMedia,
     getPostMediaByID,
     addPostComment,
-    getPostComments
+    getPostComments,
+    addReact,
+    updateReact,
+    removeReact,
+    userReactedToPost,
+    getPostReacts
 
 }

@@ -2,6 +2,7 @@
 var User = require ('../objects/user.js');
 var Profile = require ('../objects/profile.js');
 var Post = require('../objects/post.js');
+var Reacts = require('../objects/react.js');
 
 const session = require("express-session");
 
@@ -46,10 +47,16 @@ const createPost = (req, res) => {
 
     // generate a new postID
     var postID;
+    var taken = true;
     do{
         postID = Math.floor(Math.random() * 2147483646);
-
-    } while(postDAO.postIDexists(postID));
+        postDAO.postIDexists(postID, function(err, result){
+            if(err){
+                throw err;
+            }
+            taken = result;
+        });
+    } while(!taken);
 
     // get current location of user
     if(req.session != null && req.session.user){
@@ -220,12 +227,15 @@ const getPostByID = (req, res) => {
                 userServices.getProfileByID(userID, function(profile){
 
                     // fetch media links
-                    getPostMedia(postID, function(links){;
+                    getPostMedia(postID, function(links){
 
-                        // create post w/ profile & media links
-                        var post = new Post(postID, [postData.lat, postData.long], links, postData.title, postData.descr, postData.posted, profile);
+                        getAllPostReacts(postID, function(reacts){
 
-                        res.send(JSON.stringify(post));
+                            // create post w/ profile & media links
+                            var post = new Post(postID, [postData.lat, postData.long], links, postData.title, postData.descr, postData.posted, profile, reacts);
+
+                            res.send(JSON.stringify(post));
+                        });
                     });
                 });
 
@@ -342,6 +352,161 @@ const getPostComments = (req, res) =>{
 
 }
 
+// add a react to a post based upon the GET param in the link
+const addPostReact = (req, res) =>{
+
+    var react = req.params.react;
+    var postID = req.params.postID;
+    var userID = req.session.user.userID;
+
+    // not a valid react -- respond with error
+    if(typeof(react) != String){
+        res.send(400);
+    }
+
+    // check post exists
+    postDAO.postIDexists(postID, function(err, result){
+
+        // if error send 500
+        if(err){
+            res.send(500);
+        }
+        // if post doesn't exist send error 
+        else if(!result){
+            res.send(404)
+        }
+        // no error and post + react are valid -- add / update react
+        else{
+
+            // check if user has already reacted to this post
+            postDAO.userReactedToPost(userID, postID, function(err, result){
+                    
+                if(err){
+                    res.send(500);
+                }
+                // if user has existing react update it
+                else if(result){
+
+                    postDAO.updateReact(postID, userID, react, function(err, result){
+
+                        if(result){
+                            // OK
+                            res.send(200);
+                        }
+                        else{
+                            console.log(err);
+                            res.send(400);
+                        }
+                    });
+                }
+                // add new react
+                else{
+                    postDAO.addReact(postID, userID, react, function(err, result){
+
+                        if(result){
+                            // OK
+                            res.send(200);
+                        }
+                        else{
+                            // server should err if react is invalid
+                            console.log(err);
+                            res.send(400);
+                        }
+    
+                    });
+                }
+            
+            });               
+        }
+    });
+}
+
+
+// returns an associative array containing each react and who left it
+function getAllPostReacts(postID, callback){
+
+    // check post exists
+    postDAO.postIDexists(postID, function(err, result){
+
+        // if error callback null
+        if(err){
+            return callback(null);
+        }
+        // fetch reacts
+        else{
+            postDAO.addReact(postID, function(err, rows){
+
+                if(result){
+                    //init obj
+                    var reacts = new Reacts;
+
+                    // sort rows into each category
+                    rows.forEach(row =>{
+
+                        switch(row.reaction){
+                            case "love":
+                                reacts.love.push(row.react_from);
+                                break;
+                            case "happy":
+                                reacts.happy.push(row.react_from);
+                                break;
+                            case "laugh":
+                                reacts.laugh.push(row.react_from);
+                                break;
+                            case "sad":
+                                reacts.sad.push(row.react_from);
+                                break;
+                            case "angry":
+                                reacts.angry.push(row.react_from);
+                                break;
+                            default:
+                                // if not recognised do nothing
+                                break;
+                        }
+
+                    });
+
+                    // return populated object
+                    return callback(reacts);
+                }
+                else{
+                    console.log(err);
+                    return callback(null);
+                }
+
+            });
+        }
+    });
+}
+
+
+// remove the react
+const removePostReact = (req, res) =>{
+
+    var postID = req.params.postID;
+    var userID = req.session.user.userID;
+
+    // check post exists
+    postDAO.postIDexists(postID, function(err, result){
+
+        // if error callback null
+        if(err){
+            res.send(404);
+        }
+
+        postDAO.removeReact(userID, postID, function(err, result){
+            if(result){
+                // OK
+                res.send(200);
+            }
+            else{
+                console.log(err);
+                res.send(500);
+            }
+        });
+
+    });
+}
 
 module.exports = {
 
@@ -349,6 +514,8 @@ module.exports = {
     getUserPosts,
     createPost,
     addComment,
-    getPostComments
+    getPostComments,
+    addPostReact,
+    removePostReact
 
 }
