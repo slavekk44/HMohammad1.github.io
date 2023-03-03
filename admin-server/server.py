@@ -110,7 +110,7 @@ def dbexecute():
 	print("DB Execute:")
 	print(sql)
 
-	res = subprocess.run(["mysql -uscrapmap -pasdf -e \"" + sql + "\"], shell=True, capture_output=True)
+	res = subprocess.run(["mysql -uscrapmap -pasdf scrapmap -e \"" + sql + "\""], shell=True, capture_output=True)
 	# res = subprocess.run(["ls /"], shell=True, capture_output=True)
 
 	print("mysql output:")
