@@ -268,7 +268,7 @@ function getPostReacts(postID, callback){
 
 }
 
-function removeReact(postID, )
+//function removeReact(postID, )
 
 
 
