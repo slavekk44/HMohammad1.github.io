@@ -21,6 +21,9 @@
                 <div class="personal-info">
                     <div class="username">
                         <input id="username" name="username" placeholder="Username"/>
+                        <h5 id="usercheck" style="color: red;">
+                            **Username is missing!
+                        </h5>
                         <input id="disp_name" name="disp_name" placeholder="Display Name"/>
                     </div>
                     <div class="contact-name">
@@ -29,11 +32,21 @@
                     </div>
                     <div class="contact-details">
                         <input id="email" name="email" placeholder="Email Address">
+                        <small id="emailcheck" class="form-text
+                        text-muted invalid-feedback">
+                                Your email must be a valid email!
+                            </small>
                     </div>
                 </div>
                 <div class="password">
                     <input id="pw1" name="pw1" placeholder="Password"/>
+                    <h5 id="passcheck" style="color: red;">
+                        **Password is missing!
+                    </h5>
                     <input id="pw2" name="pw2" placeholder="Confirm Password"/>
+                    <h5 id="passcheck2" style="color: red;">
+                        ** Password confirmation!
+                    </h5>
                 </div>
                 <div class="row">
                     <input type="submit" name="submit"/>
